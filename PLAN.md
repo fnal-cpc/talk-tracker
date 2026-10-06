@@ -1,10 +1,18 @@
 # talk-tracker — Build Plan
 
-Status: draft v1 (2026-10-06). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.1 (2026-10-06) — scope decisions resolved (see §0). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+
+## 0. Resolved decisions (2026-10-06)
+
+1. **Scope:** the 10 pilot institutions only (§6). Expansion to ~50 later.
+2. **No conference talks** in v1. Indico is used only where a *seminar/colloquium series* is hosted on Indico (e.g. lab seminar series), not for conference agendas.
+3. **No LLM API key.** The `llm` adapter is dropped from v1; bespoke pages use the `html` (CSS selectors) or `browser` (Playwright) adapters, or are marked `unsupported`.
+4. **Public repository** (`fnal-cpc/talk-tracker`). The event archive therefore contains only publicly posted event information; no login-protected pages are scraped.
+5. **Affiliated students and postdocs are included** in the roster and in reports, labeled with their role.
 
 ## 1. Goal
 
-Find talks given by members of the Fermilab Dark Matter & Dark Energy group (and affiliated postdocs/students) at physics and astronomy colloquia and seminars across ~50 research institutions, and produce a monthly list in the format used by the group's monthly reports:
+Find talks given by members of the Fermilab Dark Matter & Dark Energy group (and affiliated postdocs/students) at physics and astronomy colloquia and seminars across research institutions (10 in the pilot; ~50 eventually), and produce a monthly list in the format used by the group's monthly reports:
 
 ```
 * Invited Talks:
@@ -29,7 +37,7 @@ Success is measured by **recall** against talks already known from previous mont
 | Accumulation | Scrape repeatedly (weekly once automated) and keep everything ever seen | Many department pages drop past events |
 | Matching | Full-name match against roster variants; weak matches flagged, never silently accepted | Name collisions (Hsu, Newman, Pai, Lapi, Gaido) seen in literature search |
 | "Invited" | Derived from series type (colloquium/seminar ⇒ invited) | Satisfies the report's requirement to state why a talk is invited |
-| LLM extraction | Optional adapter, off by default | Reduces per-site parser effort for bespoke HTML; adds cost and an API key |
+| LLM extraction | Not in v1 (no API key) | Revisit if a key becomes available; would reduce per-site parser effort for bespoke HTML |
 
 ## 3. Repository layout
 
@@ -57,11 +65,10 @@ talk-tracker/
 │   │   ├── ical.py                # .ics feeds (Google Calendar, Trumba, Drupal, etc.)
 │   │   ├── localist.py            # Localist JSON API
 │   │   ├── tribe.py               # WordPress "The Events Calendar" REST API
-│   │   ├── indico.py              # Indico HTTP export API
+│   │   ├── indico.py              # Indico HTTP export API (seminar series only)
 │   │   ├── rss.py                 # RSS/Atom event feeds
 │   │   ├── html.py                # CSS-selector-configured HTML scraping
-│   │   ├── browser.py             # Playwright for JS-rendered pages (optional)
-│   │   └── llm.py                 # LLM structured extraction (optional)
+│   │   └── browser.py             # Playwright for JS-rendered pages (optional)
 │   ├── parse.py                   # split "Speaker (Affil): Title" strings, date handling
 │   ├── archive.py                 # upsert into data/events/*.jsonl, dedupe
 │   ├── match.py                   # roster matching with confidence levels
@@ -93,10 +100,10 @@ timezone: America/Chicago
 series:
   - id: uchicago-physics-colloquium
     name: Physics Colloquium
-    type: colloquium            # colloquium | seminar | lecture | conference | other
+    type: colloquium            # colloquium | seminar | lecture | other  (conference: not in v1)
     invited: true               # default derived from type; override if needed
     url: https://...            # human-facing page (evidence link)
-    adapter: localist           # ical | localist | tribe | indico | rss | html | browser | llm
+    adapter: localist           # ical | localist | tribe | indico | rss | html | browser
     params:                     # adapter-specific
       base_url: https://...
       group: physics
@@ -117,6 +124,7 @@ series:
   variants: ["Alex Drlica-Wagner", "Alexander Drlica-Wagner", "A. Drlica-Wagner"]
   orcid: 0000-0001-8251-933X
   role: member                  # member | joint | former | postdoc | student
+  associated_with: []           # for postdocs/students: roster ids of associated members (optional)
   collisions: []                # known other people with similar names
 - id: hsu
   name: Lauren Hsu
@@ -159,11 +167,10 @@ Each adapter implements `fetch(series, start, end) -> list[RawEvent]` and raises
 | `ical` | `.ics` URL | `icalendar` + `recurring-ical-events`; covers Google Calendar, Trumba, many Drupal sites |
 | `localist` | `/api/2/events?start=&end=&group_id=&keyword=` | JSON; common at US universities |
 | `tribe` | `/wp-json/tribe/events/v1/events?start_date=&end_date=` | WordPress "The Events Calendar" |
-| `indico` | `/export/categ/<id>.json?from=&to=&detail=contributions` | Labs and conferences; some categories need auth |
+| `indico` | `/export/categ/<id>.json?from=&to=` | Seminar series hosted on Indico only; skip categories needing auth |
 | `rss` | RSS/Atom | Fallback for feeds without dates in structured form |
 | `html` | CSS selectors in `params` | For static pages; selectors for item, date, speaker, title, link |
 | `browser` | Playwright + `html` selectors | JS-rendered pages; Chromium already available |
-| `llm` | page text → JSON via an LLM API | Only for pages where selectors are impractical; requires API key; output validated against schema |
 
 ### 5.3 Parsing (`parse.py`)
 - Many feeds put speaker and affiliation in the title (e.g. `"Colloquium: Jane Doe (MIT) – Dark Matter..."`). Ordered list of regex patterns plus a per-series override pattern in `params.speaker_pattern`.
@@ -187,6 +194,7 @@ Each adapter implements `fetch(series, start, end) -> list[RawEvent]` and raises
 ```
 * Invited Talks:
   * Alex Drlica-Wagner, Colloquium, Physics Colloquium, University X — 2026-09-12 [high] <url>
+  * Aashay Pai (student), Seminar, Astro Seminar, University Y — 2026-09-20 [high] <url>
 * Needs review:
   * ...
 ```
@@ -233,7 +241,7 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 | M2 | Adapters | `ical`, `localist`, `tribe`, `indico`, `html` with fixtures and tests | All pilot series with feeds fetch successfully against fixtures; live where the domain is reachable |
 | M3 | Archive + matching | `archive.py`, `match.py`, `parse.py` | Re-running scrape is idempotent; matcher passes collision tests (Hsu, Newman, Pai, Lapi, Gaido) |
 | M4 | Report + validation | `report`, `backfill`, `check` | Backfill 12 months on pilot; compare against talks in previous reports; record recall and precision |
-| M5 | Scale to ~50 | remaining registry entries; `browser`/`llm` adapters if needed | ≥ 80 % of registered series fetch successfully; documented list of unsupported series |
+| M5 | Scale to ~50 (later) | remaining registry entries; `browser` adapter if needed | ≥ 80 % of registered series fetch successfully; documented list of unsupported series |
 | M6 | Automation | `scrape.yml` weekly GitHub Action committing `data/`; failure notifications | Two consecutive unattended weeks without manual intervention |
 
 ## 8. Testing strategy
@@ -246,7 +254,7 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 ## 9. Operations
 - **Development here (Claude workspace):** live fetching only for domains on the account's network allowlist; otherwise fixtures. Code is delivered as a git bundle and pushed to `fnal-cpc/talk-tracker` by a human.
 - **Development locally / Actions:** no allowlist; full live runs.
-- **Secrets:** none required for M0–M5 unless the `llm` adapter or authenticated Indico is used (then repository secrets).
+- **Secrets:** none required (no LLM adapter; no authenticated Indico).
 - **Etiquette:** low request rates, robots.txt respected, weekly cadence; no scraping of login-protected pages.
 
 ## 10. Risks and mitigations
@@ -254,17 +262,14 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 | Risk | Mitigation |
 |---|---|
 | Pages drop past events | Weekly accumulation; `keeps_past_events` recorded; backfill where archives exist |
-| Speaker not in a structured field | Title/abstract parsing; per-series patterns; LLM adapter as last resort |
+| Speaker not in a structured field | Title/abstract parsing; per-series patterns; full-text roster search |
 | Feeds move or break each term | `check` command; failures logged per run; health section in report |
 | Name collisions | Full-name matching, affiliation check, known-collision list, review section |
 | JS-only calendars | Playwright adapter; mark `unsupported` if cost too high |
 | Terms of use / robots.txt | Respect robots.txt; skip disallowed series; low rate |
-| Conference talks not in seminar calendars | Indico adapter for conference categories; separate "conference" type, not auto-classified as invited |
+| Conference talks not captured | Out of scope for v1; continue to find them via web search in the monthly workflow |
 | Coverage bias of institution list | Revisit list using venues from previous reports and recall misses |
 
 ## 11. Open questions
-1. Final ~50 institution list (and whether to rank by field relevance rather than general rankings).
-2. Include conferences (Indico) in v1, or seminars/colloquia only?
-3. Is an LLM API key available for the optional extraction adapter?
-4. Public or private repository (affects free Actions minutes and whether data is public).
-5. Should affiliated students/postdocs' talks be reported, or only members'?
+1. For affiliated postdocs/students, which member(s) are they associated with (`associated_with` in the roster)? Optional; used only to annotate reports.
+2. Pilot recall will be limited: most talks in previous reports are at venues outside the pilot set or at conferences (out of scope). Expect a small validation sample until the list expands.
