@@ -213,7 +213,7 @@ Chosen for likelihood that group members are invited; to be revised.
 2. Fermilab (Colloquium, Wine & Cheese, Astrophysics seminars)
 3. Northwestern (Physics & Astronomy, CIERA)
 4. Stanford / SLAC / KIPAC
-5. UC Berkeley / LBNL (Physics, Astronomy, BCCP/BCCP seminars)
+5. UC Berkeley / LBNL (Physics, Astronomy, BCCP seminars)
 6. Caltech (Physics, Astronomy, TAPIR)
 7. Princeton / IAS
 8. Harvard / CfA
