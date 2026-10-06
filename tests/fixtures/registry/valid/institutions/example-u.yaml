@@ -1,0 +1,33 @@
+# Fictional institution used by tests.
+id: example-u
+name: Example University
+country: US
+timezone: America/Chicago
+series:
+  - id: example-u-physics-colloquium
+    name: Physics Colloquium
+    type: colloquium
+    url: https://physics.example.org/colloquium
+    adapter: localist
+    params:
+      base_url: https://events.example.org
+      group: physics
+      keyword: colloquium
+    domains: [events.example.org]
+    keeps_past_events: true
+  - id: example-u-astro-seminar
+    name: Astrophysics Seminar
+    type: seminar
+    url: https://astro.example.org/seminars
+    adapter: ical
+    params:
+      ics_url: https://calendar.example.org/astro.ics
+    domains: [calendar.example.org]
+  - id: example-u-journal-club
+    name: Journal Club
+    type: other
+    url: https://astro.example.org/jc
+    adapter: unsupported
+    domains: [astro.example.org]
+    active: false
+    notes: Page is login-protected.

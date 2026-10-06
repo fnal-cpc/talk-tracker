@@ -1,0 +1,21 @@
+# --- People data must never be committed (PLAN.md §0.6, §4.2) ---
+roster*
+!roster.py
+*.roster.*
+members*
+known_talks*
+*.known.*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# --- Local fetch cache (scrape --cache) ---
+.cache/

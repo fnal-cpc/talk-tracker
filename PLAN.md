@@ -1,6 +1,6 @@
 # talk-tracker — Build Plan
 
-Status: v1.1 (2026-10-06) — scope decisions resolved (see §0). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.2 (2026-10-07) — scope decisions resolved (see §0); M0 complete (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
 
 ## 0. Resolved decisions (2026-10-06)
 
@@ -285,3 +285,22 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 ## 11. Open questions
 1. Affiliation of postdocs/students with members (`associated_with`) is optional roster input; if wanted, it should be added to the Group Members doc rather than to this repo.
 2. Pilot recall can only be measured on previously reported talks held at pilot venues; talks at other venues or conferences (e.g. the September 2026 talks at LPSC Grenoble and the Kavli Symposium, Cambridge) fall outside the pilot. The size of the usable validation sample is not yet known.
+
+## 12. Progress log
+
+### M0 — skeleton (2026-10-07)
+Delivered: package (`src/talk_tracker`), `pyproject.toml` (deps: pydantic, PyYAML, jsonschema; CLI on stdlib `argparse`), models, `registry/schema.json` + three-layer registry validation (JSON Schema → pydantic → cross-file rules), run-time roster parser (Group-Members text, YAML, JSON), adapter protocol, CLI (`validate`, `domains` working; other commands stubbed with exit status 2), CI (ruff + pytest + `talk-tracker validate` on Python 3.11–3.13), 64 tests on fictional data.
+
+Decisions and deviations made during M0:
+- `adapter: unsupported` is a schema value (M1 needs it); it requires `notes`.
+- Series ids must be prefixed with the institution id; institution files must be named `<id>.yaml`.
+- Every http(s) URL in `params` must be on a host in the series' `domains` (keeps the fetcher allowlist complete). The human-facing `url` is exempt.
+- `invited` defaults to true for `lecture` as well as `colloquium`/`seminar`.
+- `.gitignore`: `roster*` would also have hidden `roster.py`, so `!roster.py` is added; `known_talks*` and `*.known.*` are also ignored. Test fixtures for people live in `tests/fixtures/people/`.
+- `tests/test_no_people_data.py` fails on any checksum-valid ORCID iD outside a fictional allowlist, and checks the ignore rules.
+- Roster text parser: headings may carry a parenthetical note (e.g. "Known Name Conflicts (…):"); the `Known Name Conflicts` section is parsed into each person's `not:` list; a conflict entry naming an unknown person is an error; ORCID checksums are verified.
+- Name variants: full name, name without initials, first spelled given name + surname, "Surname, Given", and initial forms (stored separately as weak evidence). Surname = last token, so unhyphenated compound surnames need explicit `variants`.
+- No license chosen yet (`pyproject.toml` has none) — to be decided by the owners before the repo is public.
+
+Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
+

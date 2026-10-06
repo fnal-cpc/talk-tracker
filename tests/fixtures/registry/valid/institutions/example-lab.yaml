@@ -1,0 +1,15 @@
+id: example-lab
+name: Example National Laboratory
+country: FR
+timezone: Europe/Paris
+series:
+  - id: example-lab-seminar
+    name: Lab Seminar
+    type: seminar
+    invited: false
+    url: https://indico.example.com/category/7/
+    adapter: indico
+    params:
+      base_url: https://indico.example.com
+      category: 7
+    domains: [indico.example.com]

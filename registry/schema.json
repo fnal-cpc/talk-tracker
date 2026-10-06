@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/fnal-cpc/talk-tracker/registry/schema.json",
+  "title": "talk-tracker institution registry file",
+  "description": "One YAML file per institution, listing the seminar/colloquium series to scrape. See PLAN.md §4.1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "country", "timezone", "series"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id", "description": "Must equal the file name without extension." },
+    "name": { "type": "string", "minLength": 1 },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2." },
+    "timezone": { "type": "string", "minLength": 1, "description": "IANA zone, e.g. America/Chicago." },
+    "series": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/series" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "domain": {
+      "type": "string",
+      "pattern": "^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "type", "url", "adapter", "domains"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Must start with '<institution id>-'." },
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["colloquium", "seminar", "lecture", "other"] },
+        "invited": {
+          "type": "boolean",
+          "description": "Omit to derive from type (colloquium, seminar, lecture => invited)."
+        },
+        "url": { "type": "string", "pattern": "^https?://", "description": "Human-facing series page (evidence link)." },
+        "adapter": { "enum": ["ical", "localist", "tribe", "indico", "rss", "html", "browser", "unsupported"] },
+        "params": { "type": "object", "description": "Adapter-specific parameters." },
+        "domains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/domain" },
+          "description": "Hosts the adapter fetches from (fetcher allowlist). Every http(s) URL in params must be on one of these hosts."
+        },
+        "keeps_past_events": { "enum": [true, false, "unknown"] },
+        "active": { "type": "boolean" },
+        "notes": { "type": "string" }
+      },
+      "if": { "properties": { "adapter": { "const": "unsupported" } } },
+      "then": { "required": ["notes"], "properties": { "notes": { "minLength": 1 } } }
+    }
+  }
+}

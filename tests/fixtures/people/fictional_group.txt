@@ -1,0 +1,28 @@
+Source: fictional test data for talk-tracker. Every name and ORCID iD below is invented.
+ORCID iDs are below the range ORCID assigns (except 0000-0002-1825-0097, ORCID's own
+documented fictional example).
+
+Current Group Members:
+* Jane Q. Example (0000-0002-1825-0097)
+* Rosa Núñez-Ríos (0000-0001-0000-0009)
+* Tom Placeholder (0000-0001-1111-1118)
+
+Joint Appointments:
+* C. Robin Testcase (Example State University; 0000-0001-2222-2227)
+
+Affiliated Postdocs:
+* María J. Sample Fixture (0000-0001-3333-3336)
+
+Affiliated Students:
+* Lee Dummy (ORCID not listed)
+* Kim O'Mock (0000-0001-4444-4445)
+
+Former Members:
+* Pat Stub
+
+Projects (fictional): Project A, Project B
+
+Known Name Conflicts (different people who matched searches; do not attribute):
+* Tom Placeholder: Tim Placeholder (botany); Thomas R. Placeholder (economics). Also "Placeholder, T." on unrelated papers (unverified).
+* Lee Dummy: Lea Dummy; Leon K. Dummy.
+* Pat Stub: not a conflict, but appears mid-list on many large-collaboration papers.
