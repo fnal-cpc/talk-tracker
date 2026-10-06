@@ -272,4 +272,4 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 
 ## 11. Open questions
 1. For affiliated postdocs/students, which member(s) are they associated with (`associated_with` in the roster)? Optional; used only to annotate reports.
-2. Pilot recall will be limited: most talks in previous reports are at venues outside the pilot set or at conferences (out of scope). Expect a small validation sample until the list expands.
+2. Pilot recall can only be measured on previously reported talks held at pilot venues; talks at other venues or conferences (e.g. the September 2026 talks at LPSC Grenoble and the Kavli Symposium, Cambridge) fall outside the pilot. The size of the usable validation sample is not yet known.
