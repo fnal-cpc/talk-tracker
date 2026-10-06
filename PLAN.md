@@ -9,6 +9,7 @@ Status: v1.1 (2026-10-06) — scope decisions resolved (see §0). Owner: Fermila
 3. **No LLM API key.** The `llm` adapter is dropped from v1; bespoke pages use the `html` (CSS selectors) or `browser` (Playwright) adapters, or are marked `unsupported`.
 4. **Public repository** (`fnal-cpc/talk-tracker`). The event archive therefore contains only publicly posted event information; no login-protected pages are scraped.
 5. **Affiliated students and postdocs are included** in the roster and in reports, labeled with their role.
+6. **No roster in the repository.** The package is people-agnostic: the roster is supplied at run time from the user's own context (the "Group Members" project doc or the header of the Previous Reports Google Doc). The repo contains no names, ORCIDs, or name-collision lists of real people. Tests use fictional names.
 
 ## 1. Goal
 
@@ -35,7 +36,8 @@ Success is measured by **recall** against talks already known from previous mont
 | Scraping strategy | **One adapter per platform**, configured per series | University calendars run on a handful of platforms with structured feeds; avoids one scraper per site |
 | Storage | Append-only JSON Lines in the repo (`data/events/`) | Diffable, versioned in git, no database server |
 | Accumulation | Scrape repeatedly (weekly once automated) and keep everything ever seen | Many department pages drop past events |
-| Matching | Full-name match against roster variants; weak matches flagged, never silently accepted | Name collisions (Hsu, Newman, Pai, Lapi, Gaido) seen in literature search |
+| Matching | Full-name match against roster variants; weak matches flagged, never silently accepted | Same-name collisions were frequent in the literature search |
+| People data | Roster and known-talk lists are run-time inputs, never committed | Keeps the public repo people-agnostic; single source of truth stays in the group's own docs |
 | "Invited" | Derived from series type (colloquium/seminar ⇒ invited) | Satisfies the report's requirement to state why a talk is invited |
 | LLM extraction | Not in v1 (no API key) | Revisit if a key becomes available; would reduce per-site parser effort for bespoke HTML |
 
@@ -52,8 +54,6 @@ talk-tracker/
 │       ├── uchicago.yaml
 │       ├── fnal.yaml
 │       └── ...
-├── roster/
-│   └── roster.yaml                # members, affiliates, name variants, ORCIDs
 ├── src/talk_tracker/
 │   ├── __init__.py
 │   ├── cli.py                     # entry point: `talk-tracker ...`
@@ -71,6 +71,7 @@ talk-tracker/
 │   │   └── browser.py             # Playwright for JS-rendered pages (optional)
 │   ├── parse.py                   # split "Speaker (Affil): Title" strings, date handling
 │   ├── archive.py                 # upsert into data/events/*.jsonl, dedupe
+│   ├── roster.py                  # parse a roster supplied at run time (see §4.2)
 │   ├── match.py                   # roster matching with confidence levels
 │   ├── report.py                  # monthly report rendering (markdown)
 │   └── health.py                  # per-series status, staleness detection
@@ -116,25 +117,34 @@ series:
 
 `talk-tracker domains` prints the union of all `domains` (for the network allowlist and for the fetcher's own allowlist).
 
-### 4.2 Roster
+### 4.2 Roster (supplied at run time, never committed)
 
-```yaml
-- id: drlica-wagner
-  name: Alex Drlica-Wagner
-  variants: ["Alex Drlica-Wagner", "Alexander Drlica-Wagner", "A. Drlica-Wagner"]
-  orcid: 0000-0001-8251-933X
-  role: member                  # member | joint | former | postdoc | student
-  associated_with: []           # for postdocs/students: roster ids of associated members (optional)
-  collisions: []                # known other people with similar names
-- id: hsu
-  name: Lauren Hsu
-  variants: ["Lauren Hsu", "L. Hsu"]
-  orcid: 0000-0002-5591-6433
-  role: member
-  collisions: ["Li-Ta Hsu", "Liang-Ching Hsu"]
-```
+The roster is an **input**, passed with `--roster PATH` (or `-` for stdin). Scraping does not need it: the archive stores *all* events from registered series, and matching happens only at report time. `.gitignore` excludes `roster*`, `*.roster.*` and `members*` files to prevent accidental commits.
 
-Generated initially from the project's "Group Members" doc; maintained by hand thereafter.
+Accepted formats:
+
+1. **Group-Members text** (the format of the project doc / Google Doc header), parsed directly so the doc can be exported and passed as-is:
+   ```
+   Current Group Members:
+   * Firstname Lastname (0000-0000-0000-0000)
+   Joint Appointments:
+   * Firstname Lastname (Institution; 0000-0000-0000-0000)
+   Former Members: ...
+   Affiliated Postdocs: ...
+   Affiliated Students: ...
+   ```
+   Section headings map to roles (`member`, `joint`, `former`, `postdoc`, `student`). Name variants are generated automatically (full name, first initial + surname, with/without middle initials, hyphen/space and accent variants).
+2. **YAML/JSON** for richer input when needed:
+   ```yaml
+   - name: Firstname Lastname
+     role: student
+     orcid: 0000-0000-0000-0000      # optional
+     variants: ["F. Lastname"]       # optional, added to generated variants
+     associated_with: ["Other Member"]  # optional, report annotation only
+     not: ["Firstname2 Lastname"]    # optional, known different people (collisions)
+   ```
+
+Typical use from the Claude project: export the "Group Members" doc to a temporary file in the session and pass it with `--roster`; the file is discarded with the session.
 
 ### 4.3 Event (archive record)
 
@@ -187,14 +197,14 @@ Each adapter implements `fetch(series, start, end) -> list[RawEvent]` and raises
   - **high**: full-name variant match in speaker field.
   - **medium**: full-name match in title/abstract, or initial + surname in speaker field with a plausible affiliation (Fermilab, UChicago, Northwestern, KICP, etc.).
   - **low**: surname-only or initial + surname with no affiliation; listed only in a "needs review" section.
-- Known collisions in the roster force downgrade to low unless the affiliation matches.
+- Known collisions supplied in the roster input (`not:`) force downgrade to low unless the affiliation matches.
 
 ### 5.6 Report (`report.py`)
 `talk-tracker report --month 2026-09` produces markdown:
 ```
 * Invited Talks:
-  * Alex Drlica-Wagner, Colloquium, Physics Colloquium, University X — 2026-09-12 [high] <url>
-  * Aashay Pai (student), Seminar, Astro Seminar, University Y — 2026-09-20 [high] <url>
+  * Jane Example, Colloquium, Physics Colloquium, University X — 2026-09-12 [high] <url>
+  * Sam Sample (student), Seminar, Astro Seminar, University Y — 2026-09-20 [high] <url>
 * Needs review:
   * ...
 ```
@@ -205,12 +215,13 @@ plus a coverage footer: number of series checked, number failing, number with no
 
 ### 5.8 CLI
 ```
-talk-tracker validate                      # schema-check registry and roster
+talk-tracker validate [--roster PATH]      # schema-check registry (and a roster, if given)
 talk-tracker domains                       # print allowlist domains
 talk-tracker scrape [--series ID] [--from DATE --to DATE] [--cache]
-talk-tracker report --month YYYY-MM [--min-confidence medium]
+talk-tracker report --month YYYY-MM --roster PATH [--min-confidence medium]
 talk-tracker check                         # feed health
 talk-tracker backfill --from DATE          # one-off: pull archives where available
+talk-tracker evaluate --roster PATH --known PATH   # recall/precision vs known talks
 ```
 
 ## 6. Pilot institution set (10)
@@ -236,10 +247,10 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 
 | # | Milestone | Deliverable | Exit criterion |
 |---|---|---|---|
-| M0 | Skeleton | package, CLI stub, models, CI, schema, roster file | `pytest` and `talk-tracker validate` pass in CI |
+| M0 | Skeleton | package, CLI stub, models, CI, schema, run-time roster parser | `pytest` and `talk-tracker validate` pass in CI |
 | M1 | Pilot survey | 10 institution YAMLs; survey table (series, platform, feed, past-event retention) | Every pilot series has an adapter assignment or is marked `unsupported` with a reason |
 | M2 | Adapters | `ical`, `localist`, `tribe`, `indico`, `html` with fixtures and tests | All pilot series with feeds fetch successfully against fixtures; live where the domain is reachable |
-| M3 | Archive + matching | `archive.py`, `match.py`, `parse.py` | Re-running scrape is idempotent; matcher passes collision tests (Hsu, Newman, Pai, Lapi, Gaido) |
+| M3 | Archive + matching | `archive.py`, `roster.py`, `match.py`, `parse.py` | Re-running scrape is idempotent; matcher passes collision tests (fictional names) |
 | M4 | Report + validation | `report`, `backfill`, `check` | Backfill 12 months on pilot; compare against talks in previous reports; record recall and precision |
 | M5 | Scale to ~50 (later) | remaining registry entries; `browser` adapter if needed | ≥ 80 % of registered series fetch successfully; documented list of unsupported series |
 | M6 | Automation | `scrape.yml` weekly GitHub Action committing `data/`; failure notifications | Two consecutive unattended weeks without manual intervention |
@@ -247,9 +258,10 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 ## 8. Testing strategy
 - **Fixtures**: every series gets saved responses in `tests/fixtures/` (captured once live or via manual download). Adapters are tested offline.
 - **Parser golden tests**: title strings → expected (speaker, affiliation, title).
-- **Matcher tests**: positive cases for each roster member; negative cases from known collisions.
+- **Matcher tests**: fictional roster in `tests/fixtures/`; positive cases (variants, accents, hyphens, initials) and negative cases (same surname, same initial, `not:` collisions).
+- **Roster parser tests**: fictional Group-Members-format text → expected entries and roles.
 - **Registry validation**: JSON Schema; domains present; no duplicate IDs.
-- **Recall test (M4)**: a small YAML of known talks (from previous monthly reports) the backfill must find, where the venue is in the registry.
+- **Recall evaluation (M4)**: `talk-tracker evaluate --roster PATH --known PATH` compares the archive with a list of known talks supplied at run time (derived from previous monthly reports; not committed), restricted to venues in the registry.
 
 ## 9. Operations
 - **Development here (Claude workspace):** live fetching only for domains on the account's network allowlist; otherwise fixtures. Code is delivered as a git bundle and pushed to `fnal-cpc/talk-tracker` by a human.
@@ -271,5 +283,5 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 | Coverage bias of institution list | Revisit list using venues from previous reports and recall misses |
 
 ## 11. Open questions
-1. For affiliated postdocs/students, which member(s) are they associated with (`associated_with` in the roster)? Optional; used only to annotate reports.
+1. Affiliation of postdocs/students with members (`associated_with`) is optional roster input; if wanted, it should be added to the Group Members doc rather than to this repo.
 2. Pilot recall can only be measured on previously reported talks held at pilot venues; talks at other venues or conferences (e.g. the September 2026 talks at LPSC Grenoble and the Kavli Symposium, Cambridge) fall outside the pilot. The size of the usable validation sample is not yet known.
