@@ -4,8 +4,8 @@ Finds talks given by members of a research group at physics and astronomy colloq
 seminars, by reading the public calendars of seminar series, and produces a monthly
 "Invited Talks" list. See [PLAN.md](PLAN.md) for the design and milestones.
 
-Status: **M1 (pilot survey)**. The registry lists 35 series at 10 institutions, 24 verified
-against the live sites (see [docs/survey.md](docs/survey.md)). `validate`, `domains`, `list` and `probe`
+Status: **M1 (pilot survey)**. The registry lists 35 series at 10 institutions: 24 verified
+against the live sites, 5 unsupported, 6 awaiting re-probe (see [docs/survey.md](docs/survey.md)). `validate`, `domains`, `list` and `probe`
 work; `scrape`, `report`, `check`, `backfill` and `evaluate` are stubs that exit with
 status 2.
 
@@ -29,7 +29,8 @@ talk-tracker probe [--series ID] [--unverified] [--json out.json]  # detect plat
 ```
 
 `probe` fetches each series page and the feeds it finds, sequentially, at most one request
-per host every 2 s, respecting `robots.txt`. It prints a table comparing the registry's
+per host every 2 s, respecting `robots.txt` (public calendar feeds such as Google
+Calendar `…/public/basic.ics` are exempt; see PLAN.md §0.8). It prints a table comparing the registry's
 adapter with the suggested one (⚠ marks a disagreement).
 
 The registry directory defaults to `./registry`; override with `--registry DIR` or

@@ -19,6 +19,8 @@ series:
       "append format to listing" pattern but has not been fetched. JSON also documented
       (/list/json?filter=sponsors:<id>&range=AtoB&v=2).
       Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
+      The series page is only the evidence link; the source is events.umich.edu (which
+      answered the probe for Astronomy). Re-probe to verify the group 3804 feed.
   - id: umich-astronomy-colloquium
     name: Astronomy Colloquium
     type: colloquium
@@ -36,13 +38,16 @@ series:
     name: HEP-Astro Seminar
     type: seminar
     url: https://lsa.umich.edu/physics/news-events/seminars-colloquia/hep-astro-seminars.html
-    adapter: ical
+    adapter: unsupported
     params: {}
     domains: [events.umich.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Page has an events.umich.edu feed; group id TBD (probe).
       Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
+      UNSUPPORTED (2026-10-07): series page returns HTTP 403 and its events.umich.edu group
+      id could not be found. With the group id it can become an ical series like the others.
   - id: umich-cosmology-seminar
     name: UM Cosmology Group Seminar (LITP)
     type: seminar
@@ -53,4 +58,8 @@ series:
     domains: [lsa.umich.edu]
     keeps_past_events: true
     verified: true
-    notes: Fridays 11 am; full academic-year list on one page.
+    notes: >-
+      Fridays 11 am; full academic-year list on one page.
+      Possible structured alternative: events.umich.edu group 5046 ("Leinweber Institute for
+      Theoretical Physics Cosmology Astrophysics Seminars", iCal/JSON), which currently
+      lists the AI for Physics series; check whether cosmology seminars are posted there.

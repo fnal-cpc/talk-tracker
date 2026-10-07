@@ -19,6 +19,8 @@ series:
       Probe 2026-10-07: series page returned HTTP 403. The configured Google Calendar feed
       was not checked; calendar.google.com disallows it in robots.txt (seen for LBNL), so
       this source conflicts with the robots policy.
+      Decision 2026-10-07: public calendar feeds are exempt from robots.txt (PLAN.md §0.8),
+      so the Google Calendar feed is the source; re-probe to verify.
   - id: harvard-cfa-colloquium
     name: CfA Colloquium
     type: colloquium
@@ -34,11 +36,15 @@ series:
     name: ITC Luncheon
     type: other
     url: https://itc.cfa.harvard.edu/luncheons
-    adapter: html
-    params:
-      list_url: https://itc.cfa.harvard.edu/luncheons
+    adapter: unsupported
+    params: {}
     domains: [itc.cfa.harvard.edu]
     keeps_past_events: true
+    verified: true
+    active: false
     notes: >-
       Four 10-minute talks per session; per-year pages (itc-luncheon-YYYY-YYYY).
       Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
+      UNSUPPORTED (2026-10-07): itc.cfa.harvard.edu returns HTTP 403; the CfA page
+      (pweb.gws.cfa.harvard.edu/events/itc-luncheon) says ITC lunches are not being held at
+      this time, so the series is inactive.

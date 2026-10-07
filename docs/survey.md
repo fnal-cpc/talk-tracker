@@ -20,12 +20,13 @@ talk-tracker probe --unverified --json probe-results.json > probe-results.md
 
 * 10 institutions, 35 series: 20 colloquium, 13 seminar, 2 other (KIPAC tea talk,
   ITC luncheon; not counted as invited by default).
-* **24 verified, 11 not.**
+* **29 settled (24 verified sources, 5 `unsupported`), 6 awaiting re-probe.**
   * Verified structured sources (7): Indico ×2 (Fermilab JETP 241 events, CPC 55), iCal ×2
     (Caltech Astronomy series feed, Michigan Astronomy), PlanIt Purple ×1, Localist ×1
     (Stanford), The Events Calendar ×1 (LBNL RPM).
   * Verified `html` (17): the page loads and no event feed was found.
-* Adapters: `html` 23, `ical` 5, `planitpurple` 3, `indico` 2, `tribe` 1, `localist` 1.
+* Adapters: `html` 19, `unsupported` 5, `ical` 4, `planitpurple` 3, `indico` 2, `tribe` 1,
+  `localist` 1.
 * Past events: 33 series appear to keep past events; 2 unknown (Berkeley Physics, CfA).
 * Platforms confirmed by the probe:
   * WordPress: Fermilab (no events API), LBNL RPM (The Events Calendar), MIT MKI (no events
@@ -36,27 +37,18 @@ talk-tracker probe --unverified --json probe-results.json > probe-results.md
     the Caltech calendar CMS (series iCal feed `/calendar/ical?series=<id>`), and unbranded
     or static pages (UChicago, Berkeley cosmology, Michigan LITP).
 
-## Probe findings that need a decision
+## Decisions (2026-10-07)
 
-1. **HTTP 403 for automated clients.** Six series pages refused the probe:
-   * Harvard Physics and the ITC luncheon;
-   * MIT Physics;
-   * both Princeton Physics series;
-   * Michigan Physics and HEP-Astro.
-
-   The probe identifies itself and sends normal `Accept` headers (added after this run). If
-   these pages still refuse it, the options are:
-   * the `browser` adapter (headless Chromium);
-   * an alternative source for the same series, e.g. the events.umich.edu group feed, which
-     did work for Michigan Astronomy;
-   * `unsupported`.
-2. **Google Calendar and robots.txt.** calendar.google.com disallows its public iCal URLs
-   in robots.txt (seen for LBNL RPM). Harvard Physics' only machine-readable source is a
-   Google Calendar. Calendar clients routinely fetch these feeds, but the plan says we
-   respect robots.txt. Either make an explicit exception for public calendar feeds, or
-   leave Harvard Physics unsupported.
-3. **Per-event iCal links are not feeds.** The Caltech physics pages offer only per-event
-   `?ical` links. The probe now ignores one-event files when it suggests an adapter.
+1. **HTTP 403 for automated clients** (PLAN.md §0.7). Where another source exists for the
+   same series, it is used: Michigan Physics uses events.umich.edu. Otherwise the series is
+   `unsupported`: MIT Physics, Princeton Hamilton Colloquium, Princeton Astroparticle,
+   Michigan HEP-Astro. The ITC Luncheon is unsupported and inactive, because the CfA says the
+   lunches are not being held.
+2. **robots.txt exception for public calendar feeds** (PLAN.md §0.8; `talk_tracker.policy`).
+   Google Calendar public iCal and Outlook published-calendar URLs are fetched despite
+   robots.txt. Harvard Physics therefore uses its public Google Calendar.
+3. Per-event iCal links are not feeds. The Caltech physics pages offer only these, so the
+   probe ignores one-event files when it suggests an adapter.
 
 ## Gaps and open items
 
@@ -64,14 +56,15 @@ talk-tracker probe --unverified --json probe-results.json > probe-results.md
 |---|---|
 | Caltech Physics Colloquium, TAPIR seminar | Find physics.caltech.edu series ids, then use `/calendar/ical?series=<id>` (works on the astro site). |
 | Northwestern CIERA (2 series) | Program pages carry no PlanIt Purple link. Re-probe (the probe now checks the configured calendar); Astrophysics Seminar calendar id still TBD. |
-| Michigan Physics colloquium | Page 403. Configured feed `events.umich.edu/group/3804/ical` not yet checked; re-probe. |
-| Michigan HEP-Astro seminar | Page 403; events.umich.edu group id TBD. |
+| Michigan Physics colloquium | Source is `events.umich.edu/group/3804/ical` (page 403 is only the evidence link); re-probe. |
+| Harvard Physics colloquium | Source is the public Google Calendar feed (robots exception); re-probe. |
+| Michigan HEP-Astro seminar | Unsupported until its events.umich.edu group id is known. |
+| Michigan cosmology seminar | Possible structured alternative: events.umich.edu group 5046 (LITP cosmology/astro seminars). |
 | Berkeley Physics Colloquium | LiveWhale confirmed. Try LiveWhale `/live/ical/…` feeds in M2. |
 | KIPAC (3 series) | Drupal pages reference Localist. Check for a KIPAC group on events.stanford.edu (structured data). |
 | IAS astrophysics iCal feeds | Exist (`/ical/Astrophysics.ics`, …) but return 403; `html` used. |
 | Stanford Physics Colloquium | Localist API confirmed; department filter id TBD (`/api/2/events/filters`). |
 | MIT MKI Science Talks | Event-type slug TBD. |
-| Princeton Astroparticle Seminar | Series URL TBD (phy.princeton.edu returns 403). |
 | Harvard Astronomy department colloquium | Not identified separately from the CfA Colloquium. |
 
 ## Registry
@@ -92,8 +85,8 @@ Generated with `talk-tracker list`:
 | fnal-cpc-seminar | Fermi National Accelerator Laboratory | seminar | indico | yes | true | https://astro.fnal.gov/events/seminars/ |
 | harvard-physics-colloquium | Harvard University / Center for Astrophysics | colloquium | ical | no | true | https://www.physics.harvard.edu/colloq |
 | harvard-cfa-colloquium | Harvard University / Center for Astrophysics | colloquium | html | yes | unknown | https://www.cfa.harvard.edu/node/9159 |
-| harvard-itc-luncheon | Harvard University / Center for Astrophysics | other | html | no | true | https://itc.cfa.harvard.edu/luncheons |
-| mit-physics-colloquium | Massachusetts Institute of Technology | colloquium | html | no | true | https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/ |
+| harvard-itc-luncheon | Harvard University / Center for Astrophysics | other | unsupported | yes | true | https://itc.cfa.harvard.edu/luncheons |
+| mit-physics-colloquium | Massachusetts Institute of Technology | colloquium | unsupported | yes | true | https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/ |
 | mit-mki-astrophysics-colloquium | Massachusetts Institute of Technology | colloquium | html | yes | true | https://www.space.mit.edu/events/event-type/astrophysics-colloquium/ |
 | mit-mki-science-talks | Massachusetts Institute of Technology | seminar | html | yes | true | https://www.space.mit.edu/events/ |
 | northwestern-physics-astronomy-colloquium | Northwestern University | colloquium | planitpurple | yes | true | https://planitpurple.northwestern.edu/calendar/3758 |
@@ -101,8 +94,8 @@ Generated with `talk-tracker list`:
 | northwestern-ciera-astrophysics-seminar | Northwestern University | seminar | planitpurple | no | true | https://ciera.northwestern.edu/programs/astrophysics-seminars |
 | princeton-ias-joint-astrophysics-colloquium | Princeton University / Institute for Advanced Study | colloquium | html | yes | true | https://web.astro.princeton.edu/events/colloquia |
 | princeton-ias-astrophysics-seminars | Princeton University / Institute for Advanced Study | seminar | html | yes | true | https://www.ias.edu/sns/events/astrophysics |
-| princeton-physics-colloquium | Princeton University / Institute for Advanced Study | colloquium | html | no | true | https://phy.princeton.edu/events/donald-r-hamilton-colloquium-series |
-| princeton-astroparticle-seminar | Princeton University / Institute for Advanced Study | seminar | html | no | true | https://phy.princeton.edu/events |
+| princeton-physics-colloquium | Princeton University / Institute for Advanced Study | colloquium | unsupported | yes | true | https://phy.princeton.edu/events/donald-r-hamilton-colloquium-series |
+| princeton-astroparticle-seminar | Princeton University / Institute for Advanced Study | seminar | unsupported | yes | true | https://phy.princeton.edu/events |
 | stanford-physics-colloquium | Stanford University / SLAC / KIPAC | colloquium | localist | yes | true | https://events.stanford.edu/department/applied_physicsphysics_colloquium |
 | stanford-kipac-astrophysics-colloquium | Stanford University / SLAC / KIPAC | colloquium | html | yes | true | https://kipac.stanford.edu/events/astrophysics-colloquium-0 |
 | stanford-kipac-seminar | Stanford University / SLAC / KIPAC | seminar | html | yes | true | https://kipac.stanford.edu/events/kipac-seminar-0 |
@@ -113,5 +106,5 @@ Generated with `talk-tracker list`:
 | uchicago-astro-seminars | University of Chicago | seminar | html | yes | true | https://astrophysics.uchicago.edu/events/category/seminars |
 | umich-physics-colloquium | University of Michigan | colloquium | ical | no | true | https://lsa.umich.edu/physics/news-events/seminars-colloquia/department-colloquia.html |
 | umich-astronomy-colloquium | University of Michigan | colloquium | ical | yes | true | https://lsa.umich.edu/physics/news-events/seminars-colloquia/astronomy-colloquia.html |
-| umich-hep-astro-seminar | University of Michigan | seminar | ical | no | true | https://lsa.umich.edu/physics/news-events/seminars-colloquia/hep-astro-seminars.html |
+| umich-hep-astro-seminar | University of Michigan | seminar | unsupported | yes | true | https://lsa.umich.edu/physics/news-events/seminars-colloquia/hep-astro-seminars.html |
 | umich-cosmology-seminar | University of Michigan | seminar | html | yes | true | https://lsa.umich.edu/litp/news-events/all-events/seminars/um-cosmology-group-seminars.html |

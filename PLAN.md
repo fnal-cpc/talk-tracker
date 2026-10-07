@@ -1,6 +1,6 @@
 # talk-tracker — Build Plan
 
-Status: v1.4 (2026-10-07) — scope decisions resolved (see §0); M0 complete; M1 probed live: 24/35 series verified, 11 open (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.5 (2026-10-07) — decisions in §0 (incl. 403 handling and the robots.txt exception for public calendar feeds); M0 complete; M1: 29/35 series settled (24 verified, 5 unsupported), 6 awaiting re-probe (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
 
 ## 0. Resolved decisions (2026-10-06)
 
@@ -10,6 +10,9 @@ Status: v1.4 (2026-10-07) — scope decisions resolved (see §0); M0 complete; M
 4. **Public repository** (`fnal-cpc/talk-tracker`). The event archive therefore contains only publicly posted event information; no login-protected pages are scraped.
 5. **Affiliated students and postdocs are included** in the roster and in reports, labeled with their role.
 6. **No roster in the repository.** The package is people-agnostic: the roster is supplied at run time from the user's own context (the "Group Members" project doc or the header of the Previous Reports Google Doc). The repo contains no names, ORCIDs, or name-collision lists of real people. Tests use fictional names.
+
+7. **Sites that refuse automated clients** (HTTP 403; decided 2026-10-07): use another source for the same series when one exists (e.g. a central calendar feed); otherwise mark the series `unsupported` with the reason. No user-agent spoofing.
+8. **robots.txt exception for public calendar feeds** (decided 2026-10-07): published iCalendar feeds meant for calendar subscriptions (Google Calendar `/calendar/ical/<id>/public/{basic,full}.ics`, Outlook published `…/calendar.ics`) are fetched even when the host's robots.txt disallows them. The exception is limited to those URL shapes (`talk_tracker.policy`); rate limits and the project user agent still apply.
 
 ## 1. Goal
 
@@ -166,7 +169,7 @@ Typical use from the Claude project: export the "Group Members" doc to a tempora
 
 ### 5.1 Fetcher (`fetch.py`)
 - `httpx` client with per-domain rate limit (default 1 request / 2 s), timeouts, 3 retries with backoff.
-- Respects `robots.txt`; identifies itself with a user agent that names the project and repo URL.
+- Respects `robots.txt`, except for public calendar feeds (§0.8, `talk_tracker.policy`); identifies itself with a user agent that names the project and repo URL.
 - Refuses domains not listed in the registry (its own allowlist).
 - Optional on-disk cache for development (`--cache`), which also lets tests run on saved responses.
 
@@ -271,7 +274,7 @@ For each: identify 2–4 series, the platform, feed URL, whether past events are
 - **Development here (Claude workspace):** live fetching only for domains on the account's network allowlist; otherwise fixtures. Code is delivered as a git bundle and pushed to `fnal-cpc/talk-tracker` by a human.
 - **Development locally / Actions:** no allowlist; full live runs.
 - **Secrets:** none required (no LLM adapter; no authenticated Indico).
-- **Etiquette:** low request rates, robots.txt respected, weekly cadence; no scraping of login-protected pages.
+- **Etiquette:** low request rates, robots.txt respected (public calendar feeds excepted, §0.8), weekly cadence; no scraping of login-protected pages; no user-agent spoofing (§0.7).
 
 ## 10. Risks and mitigations
 
@@ -308,7 +311,7 @@ Decisions and deviations made during M0:
 
 Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
 
-### M1 — pilot survey (2026-10-07; probed live, 11 series open)
+### M1 — pilot survey (2026-10-07; 6 series awaiting re-probe)
 Delivered: 10 institution files (35 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
 
 How the survey was done: the Claude workspace cannot reach university or lab sites from its shell, and its page fetcher returns extracted text without `<head>`/feed links (and sometimes stale copies). Assignments were therefore made from web search and page text. All series are `verified: false`. The exit criterion ("every pilot series has an adapter assignment or is marked unsupported") is met provisionally. M1 is complete once `talk-tracker probe` has been run from a normal network and its results applied.
@@ -333,4 +336,9 @@ M1 probe run (2026-10-07, from a group member's machine):
   - robots.txt blocks are reported as such;
   - new `--unverified` flag.
 - Decisions needed (see `docs/survey.md`): (1) how to handle the 403 pages (browser adapter vs. alternative source vs. unsupported); (2) whether public calendar feeds (Google Calendar iCal) may be fetched despite robots.txt.
+
+Decisions applied (2026-10-07, §0.7–0.8):
+- `unsupported` (no alternative source found): MIT Harris Physics Colloquium, Princeton Hamilton Colloquium, Princeton Astroparticle Seminar, Michigan HEP-Astro (group id unknown). ITC Luncheon is also unsupported and set to `active: false`, because CfA states the lunches are not being held.
+- Alternative sources kept: Michigan Physics uses events.umich.edu group 3804, not the refused LSA page. Harvard Physics uses its public Google Calendar feed under the new robots exception.
+- Unsupported series count as settled (`verified: true`). The remaining 6 unverified series are Caltech Physics/TAPIR (series ids), CIERA ×2, Harvard Physics and Michigan Physics. They will be settled by `talk-tracker probe --unverified`.
 

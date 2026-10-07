@@ -30,6 +30,7 @@ from html.parser import HTMLParser
 from urllib.parse import parse_qs, quote, unquote, urljoin, urlsplit
 
 from . import __version__
+from .policy import is_public_calendar_feed
 
 USER_AGENT = f"talk-tracker/{__version__} (+https://github.com/fnal-cpc/talk-tracker; survey probe)"
 REQUEST_HEADERS = {
@@ -321,6 +322,8 @@ class Fetcher:
         self._last[host] = time.monotonic()
 
     def allowed(self, url: str) -> bool:
+        if is_public_calendar_feed(url):
+            return True  # documented exception, see talk_tracker.policy
         parts = urlsplit(url)
         key = f"{parts.scheme}://{parts.netloc}"
         if key not in self._robots:

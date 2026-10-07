@@ -8,15 +8,17 @@ series:
     name: David and Edith Harris Physics Colloquium
     type: colloquium
     url: https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/
-    adapter: html
-    params:
-      list_url: https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/
+    adapter: unsupported
+    params: {}
     domains: [physics.mit.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       WordPress; current and past semesters on one page (date, speaker, affiliation,
       title). Department calendar at physics.mit.edu/events/.
       Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
+      UNSUPPORTED (2026-10-07): physics.mit.edu returns HTTP 403 to automated clients and no
+      alternative source was found (searched MIT central calendar listings).
   - id: mit-mki-astrophysics-colloquium
     name: MKI Astrophysics Colloquium
     type: colloquium
