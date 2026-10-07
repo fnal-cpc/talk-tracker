@@ -73,3 +73,30 @@ def test_registry_env_var(make_registry, monkeypatch, capsys):
 def test_pending_commands(argv, capsys):
     assert main(argv) == 2
     assert "not implemented yet" in capsys.readouterr().err
+
+
+def test_probe_unverified_selection(make_registry, monkeypatch, capsys):
+    import talk_tracker.probe as probe
+
+    seen = []
+
+    def fake_probe(series, fetcher, check_feeds=True):
+        seen.append(series.id)
+        return probe.ProbeResult(series.id, series.url, str(series.adapter), error="skipped")
+
+    monkeypatch.setattr(probe, "probe_series", fake_probe)
+    text = (FIXTURES / "registry" / "valid" / "institutions" / "example-lab.yaml").read_text()
+    root = make_registry(
+        {
+            "example-lab.yaml": text.replace(
+                "    domains: [indico.example.com]",
+                "    domains: [indico.example.com]\n    verified: true",
+            )
+        },
+        from_fixture=None,
+    )
+    assert main(["--registry", str(root), "probe", "--unverified"]) == 0
+    assert seen == []
+    assert main(["--registry", str(root), "probe"]) == 0
+    assert seen == ["example-lab-seminar"]
+    assert "page: skipped" in capsys.readouterr().out

@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live). Includes CfA.
+# Survey 2026-10-07 (web search); probed live 2026-10-07. Includes CfA.
 id: harvard
 name: Harvard University / Center for Astrophysics
 country: US
@@ -16,6 +16,9 @@ series:
     notes: >-
       Page embeds Google Calendar 431lpisdro6mh8clb6df1rl9p0@group.calendar.google.com;
       ics_url is the standard public-feed form of that id (not yet fetched).
+      Probe 2026-10-07: series page returned HTTP 403. The configured Google Calendar feed
+      was not checked; calendar.google.com disallows it in robots.txt (seen for LBNL), so
+      this source conflicts with the robots policy.
   - id: harvard-cfa-colloquium
     name: CfA Colloquium
     type: colloquium
@@ -25,6 +28,7 @@ series:
       list_url: https://www.cfa.harvard.edu/node/9159
     domains: [www.cfa.harvard.edu]
     keeps_past_events: unknown
+    verified: true
     notes: Drupal 10; term schedule table (date, speaker, title).
   - id: harvard-itc-luncheon
     name: ITC Luncheon
@@ -35,4 +39,6 @@ series:
       list_url: https://itc.cfa.harvard.edu/luncheons
     domains: [itc.cfa.harvard.edu]
     keeps_past_events: true
-    notes: Four 10-minute talks per session; per-year pages (itc-luncheon-YYYY-YYYY).
+    notes: >-
+      Four 10-minute talks per session; per-year pages (itc-luncheon-YYYY-YYYY).
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).

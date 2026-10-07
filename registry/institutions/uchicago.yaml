@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live).
+# Survey 2026-10-07 (web search); probed live 2026-10-07.
 id: uchicago
 name: University of Chicago
 country: US
@@ -13,6 +13,7 @@ series:
       list_url: https://physics.uchicago.edu/events/category/colloquia-and-lectures/
     domains: [physics.uchicago.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Category "Colloquia and Lectures" (also contains other lectures). Past event pages
       remain at /events/event/<n>?past=y. No feed link seen in page text; same events CMS
@@ -27,6 +28,7 @@ series:
       past_url: https://astrophysics.uchicago.edu/events/past-events/
     domains: [astrophysics.uchicago.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       One listing for KICP Colloquium, Astronomy Colloquium and named lectures (e.g.
       Wasserburg Lecture); the series label is in each entry. Past events paginated as
@@ -40,4 +42,5 @@ series:
       list_url: https://astrophysics.uchicago.edu/events/category/seminars
     domains: [astrophysics.uchicago.edu]
     keeps_past_events: true
+    verified: true
     notes: Entries read "<Speaker> (<Affil>) will give the KICP Seminar on <m/d>".

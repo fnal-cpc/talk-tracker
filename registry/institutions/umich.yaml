@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live).
+# Survey 2026-10-07 (web search); probed live 2026-10-07.
 id: umich
 name: University of Michigan
 country: US
@@ -18,6 +18,7 @@ series:
       Happening @ Michigan group 3804 (RSS link on the page). ics_url follows the documented
       "append format to listing" pattern but has not been fetched. JSON also documented
       (/list/json?filter=sponsors:<id>&range=AtoB&v=2).
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
   - id: umich-astronomy-colloquium
     name: Astronomy Colloquium
     type: colloquium
@@ -27,7 +28,10 @@ series:
       ics_url: https://events.umich.edu/group/1178/ical
     domains: [events.umich.edu]
     keeps_past_events: true
-    notes: Happening @ Michigan group 1178 = Department of Astronomy (all astronomy events).
+    verified: true
+    notes: >-
+      Happening @ Michigan group 1178 = Department of Astronomy (all astronomy events).
+      Probe 2026-10-07: group 1178 iCal OK (5 events).
   - id: umich-hep-astro-seminar
     name: HEP-Astro Seminar
     type: seminar
@@ -36,7 +40,9 @@ series:
     params: {}
     domains: [events.umich.edu]
     keeps_past_events: true
-    notes: Page has an events.umich.edu feed; group id TBD (probe).
+    notes: >-
+      Page has an events.umich.edu feed; group id TBD (probe).
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
   - id: umich-cosmology-seminar
     name: UM Cosmology Group Seminar (LITP)
     type: seminar
@@ -46,4 +52,5 @@ series:
       list_url: https://lsa.umich.edu/litp/news-events/all-events/seminars/um-cosmology-group-seminars.html
     domains: [lsa.umich.edu]
     keeps_past_events: true
+    verified: true
     notes: Fridays 11 am; full academic-year list on one page.

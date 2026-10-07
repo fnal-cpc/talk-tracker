@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live). Includes SLAC and KIPAC.
+# Survey 2026-10-07 (web search); probed live 2026-10-07. Includes SLAC and KIPAC.
 id: stanford
 name: Stanford University / SLAC / KIPAC
 country: US
@@ -14,9 +14,11 @@ series:
       department: applied_physicsphysics_colloquium
     domains: [events.stanford.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       events.stanford.edu is Localist (localist meta tags; per-event .ics). Department
       filter id to be resolved via /api/2/events/filters.
+      Probe 2026-10-07: Localist API OK at events.stanford.edu/api/2/events.
   - id: stanford-kipac-astrophysics-colloquium
     name: KIPAC Astrophysics Colloquium
     type: colloquium
@@ -26,7 +28,12 @@ series:
       list_url: https://kipac.stanford.edu/events/astrophysics-colloquium-0
     domains: [kipac.stanford.edu]
     keeps_past_events: true
-    notes: Drupal 11; past events at /events/past-events. Check whether also on Localist.
+    verified: true
+    notes: >-
+      Drupal 11; past events at /events/past-events. Check whether also on Localist.
+      Probe 2026-10-07: Drupal page references Localist but kipac.stanford.edu has no
+      Localist API; events may be syndicated from events.stanford.edu (look for a KIPAC
+      group there). html confirmed meanwhile.
   - id: stanford-kipac-seminar
     name: KIPAC Seminar
     type: seminar
@@ -36,6 +43,11 @@ series:
       list_url: https://kipac.stanford.edu/events/kipac-seminar-0
     domains: [kipac.stanford.edu]
     keeps_past_events: true
+    verified: true
+    notes: >-
+      Probe 2026-10-07: Drupal page references Localist but kipac.stanford.edu has no
+      Localist API; events may be syndicated from events.stanford.edu (look for a KIPAC
+      group there). html confirmed meanwhile.
   - id: stanford-kipac-tea-talk
     name: KIPAC Tea Talk
     type: other
@@ -45,7 +57,12 @@ series:
       list_url: https://kipac.stanford.edu/events/kipac-tea-talk-0
     domains: [kipac.stanford.edu]
     keeps_past_events: true
-    notes: Short talks by visitors and locals; not invited by default (type other).
+    verified: true
+    notes: >-
+      Short talks by visitors and locals; not invited by default (type other).
+      Probe 2026-10-07: Drupal page references Localist but kipac.stanford.edu has no
+      Localist API; events may be syndicated from events.stanford.edu (look for a KIPAC
+      group there). html confirmed meanwhile.
   - id: stanford-slac-colloquium
     name: SLAC Colloquium
     type: colloquium
@@ -56,4 +73,5 @@ series:
       past_url: https://colloquium.slac.stanford.edu/past-events
     domains: [colloquium.slac.stanford.edu]
     keeps_past_events: true
+    verified: true
     notes: Drupal 10. Mondays 4:30 pm.

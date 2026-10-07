@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live).
+# Survey 2026-10-07 (web search); probed live 2026-10-07.
 id: caltech
 name: California Institute of Technology
 country: US
@@ -17,16 +17,22 @@ series:
       Caltech division calendars share one CMS (also pma/pva/qse.caltech.edu). Listing
       supports /calendar/filter?...&series=<id>&past=1; each event has <url>?ical.
       Series id for Physics Colloquium to be found by probe.
+      Probe 2026-10-07: same CMS as www.astro.caltech.edu, whose series feed
+      /calendar/ical?series=<id> works; page shows only per-event ?ical links. Find the
+      physics.caltech.edu series id, then switch to ical.
   - id: caltech-astronomy-colloquium
     name: Astronomy Colloquium
     type: colloquium
     url: https://www.astro.caltech.edu/calendar/filter?date_start=&date_end=&type=all&search=&past=0&mc=1&series=22
-    adapter: html
+    adapter: ical
     params:
-      list_url: https://www.astro.caltech.edu/calendar/filter?date_start=&date_end=&type=all&search=&past=0&mc=1&series=22
+      ics_url: https://www.astro.caltech.edu/calendar/ical?series=22
     domains: [www.astro.caltech.edu]
     keeps_past_events: true
-    notes: Series id 22 (from an event page). Per-event iCal at <event url>?ical.
+    verified: true
+    notes: >-
+      Series id 22 (from an event page). Per-event iCal at <event url>?ical.
+      Probe 2026-10-07: series feed /calendar/ical?series=22 returns iCal (36 events).
   - id: caltech-tapir-seminar
     name: TAPIR Seminar
     type: seminar
@@ -36,4 +42,8 @@ series:
       list_url: https://physics.caltech.edu/events/seminar-calendar
     domains: [physics.caltech.edu]
     keeps_past_events: true
-    notes: Listed in the physics seminar calendar as "TAPIR Seminar Series"; series id TBD.
+    notes: >-
+      Listed in the physics seminar calendar as "TAPIR Seminar Series"; series id TBD.
+      Probe 2026-10-07: same CMS as www.astro.caltech.edu, whose series feed
+      /calendar/ical?series=<id> works; page shows only per-event ?ical links. Find the
+      physics.caltech.edu series id, then switch to ical.

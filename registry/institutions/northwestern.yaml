@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live).
+# Survey 2026-10-07 (web search); probed live 2026-10-07.
 id: northwestern
 name: Northwestern University
 country: US
@@ -14,10 +14,12 @@ series:
       cal: 3758
     domains: [planitpurple.northwestern.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       PlanIt Purple calendar 3758. Documented XML feed: /xmlfeed?cal=<id>&start=mm-dd-yyyy
       &end=mm-dd-yyyy (archive=1 reaches 4 years back). Titles read
       "Colloquium: <Speaker>: <Title>".
+      Probe 2026-10-07: xmlfeed OK (7 items).
   - id: northwestern-ciera-interdisciplinary-colloquium
     name: CIERA Interdisciplinary Colloquia
     type: colloquium
@@ -28,6 +30,9 @@ series:
       cal: 4336
     domains: [planitpurple.northwestern.edu]
     keeps_past_events: true
+    notes: >-
+      Probe 2026-10-07: program page is WordPress with no PlanIt Purple calendar link; the
+      configured calendar was not tested by this probe version (re-run).
   - id: northwestern-ciera-astrophysics-seminar
     name: CIERA Astrophysics Seminar
     type: seminar
@@ -41,3 +46,5 @@ series:
       Tuesdays 11 am. Events link to planitpurple.northwestern.edu/event/<id>; calendar id
       not yet identified (TODO: probe). CIERA's visitor database
       (ciera.northwestern.edu/visits/) lists past speakers.
+      Probe 2026-10-07: program page is WordPress with no PlanIt Purple calendar link; the
+      configured calendar was not tested by this probe version (re-run).

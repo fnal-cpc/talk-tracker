@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live). Includes LBNL.
+# Survey 2026-10-07 (web search); probed live 2026-10-07. Includes LBNL.
 id: berkeley
 name: UC Berkeley / Lawrence Berkeley National Laboratory
 country: US
@@ -13,9 +13,12 @@ series:
       list_url: https://events.berkeley.edu/physics/all/search/Colloquia
     domains: [events.berkeley.edu]
     keeps_past_events: unknown
+    verified: true
     notes: >-
       Linked from physics.berkeley.edu (Open Berkeley). events.berkeley.edu platform not
       identified (LiveWhale or Localist); probe for its feed before writing selectors.
+      Probe 2026-10-07: generator LiveWhale Calendar (confirmed). No feed linked from the
+      page; LiveWhale serves /live/ical/... and /live/json/... feeds, to be tried in M2.
   - id: berkeley-astronomy-colloquium
     name: Astronomy Colloquium
     type: colloquium
@@ -25,6 +28,7 @@ series:
       list_url: https://astro.berkeley.edu/astronomy-colloquium
     domains: [astro.berkeley.edu]
     keeps_past_events: true
+    verified: true
     notes: Open Berkeley; term schedule table. Department events archive at /news/events/archive/.
   - id: berkeley-cosmology-seminar
     name: BCCP / Berkeley Cosmology Seminar
@@ -35,6 +39,7 @@ series:
       list_url: https://cosmology.lbl.gov/sem_bcg_future.html
     domains: [cosmology.lbl.gov]
     keeps_past_events: true
+    verified: true
     notes: >-
       Static hand-edited HTML (Tuesdays 1:10 pm). Yearly pages bcg_seminars_YY_YY.html and
       bcg_pastsems.html.
@@ -47,6 +52,10 @@ series:
       base_url: https://rpm.physics.lbl.gov
     domains: [rpm.physics.lbl.gov]
     keeps_past_events: true
+    verified: true
     notes: >-
       WordPress with The Events Calendar (tribe-bar seen). Also Indico category 58 at
       indico.physics.lbl.gov and a Google Calendar subscription.
+      Probe 2026-10-07: tribe API OK (3 upcoming), events/?ical=1 OK; Indico category 58
+      export OK (19 items, alternative with history); the Google Calendar is disallowed by
+      robots.txt.

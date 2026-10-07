@@ -32,6 +32,12 @@ from urllib.parse import parse_qs, quote, unquote, urljoin, urlsplit
 from . import __version__
 
 USER_AGENT = f"talk-tracker/{__version__} (+https://github.com/fnal-cpc/talk-tracker; survey probe)"
+REQUEST_HEADERS = {
+    "User-Agent": USER_AGENT,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+    "text/calendar;q=0.9,application/json;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.8",
+}
 MIN_DELAY_S = 2.0
 TIMEOUT_S = 20.0
 MAX_BYTES = 3_000_000
@@ -114,6 +120,10 @@ _INDICO_CATEG = re.compile(r"/categor(?:y|yDisplay\.py\?categId=)/?(\d+)")
 _PPURPLE_CAL = re.compile(r"planitpurple\.northwestern\.edu/(?:calendar/|xmlfeed\?cal=)(\d+)")
 _UMICH_GROUP = re.compile(r"events\.umich\.edu/group/(\d+)")
 _RSEM = re.compile(r"researchseminars\.org/seminar/([A-Za-z0-9_]+)")
+#: links that are never event feeds (WordPress comment feeds, REST page/post objects)
+_NOT_EVENTS = re.compile(r"/comments/feed/?$|/wp-json/wp/v2/|/wp-json/?$|/oembed", re.I)
+#: WordPress site-wide posts feed (/feed/ at the end of a path): news, not events
+_SITE_FEED = re.compile(r"/feed/?$", re.I)
 
 
 def _abs(base: str, href: str) -> str:
@@ -156,6 +166,8 @@ def detect(html: str, page_url: str) -> Detection:
 
     # <link rel="alternate" ...>
     for ln in scan.links:
+        if _NOT_EVENTS.search(ln.get("href", "")):
+            continue
         rel = ln.get("rel", "").lower()
         typ = ln.get("type", "").lower()
         href = ln.get("href", "")
@@ -163,7 +175,8 @@ def detect(html: str, page_url: str) -> Detection:
             if "calendar" in typ:
                 det.add_feed("ical", _abs(page_url, href), "<link rel=alternate>")
             elif "rss" in typ:
-                det.add_feed("rss", _abs(page_url, href), "<link rel=alternate>")
+                kind = "site-rss" if _SITE_FEED.search(href) else "rss"
+                det.add_feed(kind, _abs(page_url, href), "<link rel=alternate>")
             elif "atom" in typ:
                 det.add_feed("atom", _abs(page_url, href), "<link rel=alternate>")
             elif "json" in typ and "oembed" not in typ:
@@ -205,8 +218,8 @@ def detect(html: str, page_url: str) -> Detection:
             det.add_feed(
                 "ical", f"https://researchseminars.org/seminar/{m.group(1)}/ics", "researchseminars"
             )
-        if re.search(r"/feed/?$|/rss/?$|[?&]feed=rss", href, re.I):
-            det.add_feed("rss", full, "link")
+        if re.search(r"/feed/?$|/rss/?$|[?&]feed=rss", href, re.I) and not _NOT_EVENTS.search(href):
+            det.add_feed("site-rss" if _SITE_FEED.search(href) else "rss", full, "link")
 
     # Google Calendar ids embedded in scripts/data attributes
     for m in _GCAL_SRC.finditer(html):
@@ -271,8 +284,15 @@ def suggest_adapter(det: Detection) -> str:
     """Pick the most structured adapter among the candidates (checked feeds first)."""
 
     def usable(f: Feed) -> bool:
-        return f.check is None or f.check.startswith("ok")
+        if f.check is None:
+            return True
+        # a .ics with exactly one event is a per-event "add to calendar" link, not a feed
+        return f.check.startswith("ok") and "(1 events)" not in f.check
 
+    # a registry-configured source that checks out wins: the assignment is confirmed
+    for f in det.feeds:
+        if f.source.startswith("registry") and f.check and usable(f) and f.kind in _ADAPTER_FOR:
+            return _ADAPTER_FOR[f.kind]
     for kind in _PREFERENCE:
         for f in det.feeds:
             if f.kind == kind and usable(f) and kind in _ADAPTER_FOR:
@@ -318,7 +338,7 @@ class Fetcher:
         if check_robots and not self.allowed(url):
             raise PermissionError(f"robots.txt disallows {url}")
         self._wait(urlsplit(url).netloc)
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+        req = urllib.request.Request(url, headers=REQUEST_HEADERS)
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 ctype = resp.headers.get("Content-Type", "")
@@ -379,35 +399,64 @@ class ProbeResult:
         return asdict(self)
 
 
+def registry_sources(series) -> list[Feed]:
+    """The source(s) the registry entry already configures, as checkable feeds."""
+    p = series.params
+    a = str(series.adapter)
+    out: list[Feed] = []
+    if a == "indico" and "base_url" in p and "category" in p:
+        out.append(Feed("indico", f"{p['base_url']}/export/categ/{p['category']}.json", "registry"))
+    elif a == "planitpurple" and "base_url" in p and "cal" in p:
+        out.append(
+            Feed("planitpurple", f"{p['base_url']}/xmlfeed?cal={p['cal']}&days=0", "registry")
+        )
+    elif a == "tribe" and "base_url" in p:
+        out.append(Feed("tribe", f"{p['base_url']}/wp-json/tribe/events/v1/events", "registry"))
+    elif a == "localist" and "base_url" in p:
+        out.append(Feed("localist", f"{p['base_url']}/api/2/events", "registry"))
+    for key, val in p.items():
+        if isinstance(val, str) and val.startswith("http") and key.endswith(("ics_url", "rss_url")):
+            out.append(Feed("ical" if key.endswith("ics_url") else "rss", val, f"registry {key}"))
+    return out
+
+
+def _error_text(exc: BaseException) -> str:
+    if isinstance(exc, PermissionError):
+        return "blocked by robots.txt"
+    return f"{type(exc).__name__}: {exc}"
+
+
 def probe_series(series, fetcher: Fetcher, check_feeds: bool = True) -> ProbeResult:
     res = ProbeResult(series.id, series.url, str(series.adapter))
+    det = Detection()
     try:
         status, body, _ctype = fetcher.get(series.url)
+        res.status = status
+        if status >= 400:
+            res.error = f"HTTP {status}"
+        else:
+            det = detect(body.decode("utf-8", "replace"), series.url)
     except (OSError, urllib.error.URLError, PermissionError) as exc:
-        res.error = f"{type(exc).__name__}: {exc}"
+        res.error = _error_text(exc)
+    # the registry's configured source is checked first, whatever the page did
+    det.feeds = [*registry_sources(series), *det.feeds]
+    if res.error and not det.feeds:
         return res
-    res.status = status
-    if status >= 400:
-        res.error = f"HTTP {status}"
-        return res
-    det = detect(body.decode("utf-8", "replace"), series.url)
-    # registry params may already name a feed: check it too
-    for key, val in series.params.items():
-        if isinstance(val, str) and val.startswith("http") and key.endswith(("ics_url", "rss_url")):
-            det.add_feed("ical" if key.endswith("ics_url") else "rss", val, f"registry {key}")
     if check_feeds:
         checked: dict[str, int] = {}
         for f in det.feeds:
+            if f.kind == "site-rss":
+                continue
             checked[f.kind] = checked.get(f.kind, 0) + 1
-            if checked[f.kind] > MAX_CHECKS_PER_KIND:
+            if checked[f.kind] > MAX_CHECKS_PER_KIND and not f.source.startswith("registry"):
                 f.check = None
                 continue
             try:
                 st, fb, fct = fetcher.get(_feed_test_url(f))
                 f.check = classify_body(fb, fct) if st < 400 else f"HTTP {st}"
             except (OSError, urllib.error.URLError, PermissionError) as exc:
-                f.check = f"error: {type(exc).__name__}"
-        det.suggested_adapter = suggest_adapter(det)
+                f.check = _error_text(exc)
+    det.suggested_adapter = suggest_adapter(det)
     res.detection = det
     return res
 
@@ -419,14 +468,15 @@ def render_markdown(results: list[ProbeResult]) -> str:
     ]
     for r in results:
         if r.detection is None:
-            lines.append(f"| {r.series_id} | {r.registry_adapter} | – | – | – | {r.error} |")
+            lines.append(f"| {r.series_id} | {r.registry_adapter} | – | – | – | page: {r.error} |")
             continue
         d = r.detection
+        notes = ([f"page: {r.error}"] if r.error else []) + d.notes
         feeds = "<br>".join(f"{f.kind}: {f.url} ({f.check or 'unchecked'})" for f in d.feeds)
         plat = ", ".join(filter(None, [*d.platforms, d.generator])) or "?"
         flag = "" if d.suggested_adapter == r.registry_adapter else " ⚠"
         lines.append(
             f"| {r.series_id} | {r.registry_adapter} | {d.suggested_adapter}{flag} | {plat} "
-            f"| {feeds or '–'} | {'; '.join(d.notes)} |"
+            f"| {feeds or '–'} | {'; '.join(notes)} |"
         )
     return "\n".join(lines) + "\n"

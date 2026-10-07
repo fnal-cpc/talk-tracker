@@ -1,6 +1,6 @@
 # talk-tracker — Build Plan
 
-Status: v1.3 (2026-10-07) — scope decisions resolved (see §0); M0 complete; M1 survey done from search, awaiting live probe (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.4 (2026-10-07) — scope decisions resolved (see §0); M0 complete; M1 probed live: 24/35 series verified, 11 open (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
 
 ## 0. Resolved decisions (2026-10-06)
 
@@ -308,7 +308,7 @@ Decisions and deviations made during M0:
 
 Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
 
-### M1 — pilot survey (2026-10-07; live confirmation pending)
+### M1 — pilot survey (2026-10-07; probed live, 11 series open)
 Delivered: 10 institution files (35 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
 
 How the survey was done: the Claude workspace cannot reach university or lab sites from its shell, and its page fetcher returns extracted text without `<head>`/feed links (and sometimes stale copies). Assignments were therefore made from web search and page text. All series are `verified: false`. The exit criterion ("every pilot series has an adapter assignment or is marked unsupported") is met provisionally. M1 is complete once `talk-tracker probe` has been run from a normal network and its results applied.
@@ -320,4 +320,17 @@ Decisions and deviations made during M1:
 - KIPAC tea talks and ITC luncheons are registered as `type: other` (not invited by default) so that they show up only for review.
 - `html` with `params.list_url` is used as the placeholder where no feed was identified: 24 of 35 series. The probe is expected to move some of them to structured adapters.
 - Princeton (Hamilton Colloquium, Astroparticle Seminar, Princeton Astro colloquium page) and MIT (Harris Physics Colloquium, MKI event-type pages) URLs were supplied by the group. MIT MKI was moved from `tribe` to `html` until the probe settles which applies. See `docs/survey.md` for the remaining TBD ids.
+
+M1 probe run (2026-10-07, from a group member's machine):
+- 24/35 series verified (7 with structured feeds, 17 `html`). Caltech Astronomy moved to its series iCal feed (`/calendar/ical?series=22`, 36 events).
+- 6 series pages return HTTP 403 to automated clients (Harvard Physics and ITC, MIT Physics, Princeton Physics ×2, Michigan Physics and HEP-Astro).
+- calendar.google.com disallows public iCal URLs in robots.txt, which affects Harvard Physics (only source is a Google Calendar).
+- Probe improvements from this run:
+  - the registry-configured source is always checked, even when the page fails;
+  - WordPress site/comment feeds and REST page objects are no longer treated as event feeds;
+  - single-event `.ics` links are not suggested as feeds;
+  - normal `Accept`/`Accept-Language` headers are sent;
+  - robots.txt blocks are reported as such;
+  - new `--unverified` flag.
+- Decisions needed (see `docs/survey.md`): (1) how to handle the 403 pages (browser adapter vs. alternative source vs. unsupported); (2) whether public calendar feeds (Google Calendar iCal) may be fetched despite robots.txt.
 

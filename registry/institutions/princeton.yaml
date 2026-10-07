@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search + URLs supplied by the group; feeds not yet probed live).
+# Survey 2026-10-07 (web search + URLs supplied by the group); probed live 2026-10-07.
 # Includes IAS.
 id: princeton
 name: Princeton University / Institute for Advanced Study
@@ -14,6 +14,7 @@ series:
       list_url: https://web.astro.princeton.edu/events/colloquia
     domains: [web.astro.princeton.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Drupal 11. Princeton Astro page lists the current and past semesters on one page
       (date, speaker, affiliation). Mirror: www.ias.edu/sns/astrophysics/joint-iaspu-
@@ -27,9 +28,13 @@ series:
       list_url: https://www.ias.edu/sns/events/astrophysics
     domains: [www.ias.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Combined calendar (IAS Astrophysics Seminar, informal seminars, joint colloquium);
       paginated (?page=N, 13+ pages seen). Entries need per-event series labels.
+      Probe 2026-10-07: page links iCal feeds (/ical/Astrophysics.ics, /ical/Astro-
+      Joint%20IAS%20Princeton.ics, ...) but they return HTTP 403 to the probe. html
+      confirmed.
   - id: princeton-physics-colloquium
     name: Donald R. Hamilton Colloquium
     type: colloquium
@@ -39,7 +44,10 @@ series:
       list_url: https://phy.princeton.edu/events/donald-r-hamilton-colloquium-series
     domains: [phy.princeton.edu]
     keeps_past_events: true
-    notes: Princeton Physics colloquium (Drupal 11). Department-wide past events at /events/archive.
+    notes: >-
+      Princeton Physics colloquium (Drupal 11). Department-wide past events at
+      /events/archive.
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
   - id: princeton-astroparticle-seminar
     name: Astroparticle Seminar
     type: seminar
@@ -53,3 +61,4 @@ series:
       Listed as a series filter on phy.princeton.edu/events; the series-specific URL was not
       visible in page text (TBD by probe). Other series there (HEP experiment/theory,
       gravity, phenomenology) not registered.
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).

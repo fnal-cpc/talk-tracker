@@ -1,4 +1,4 @@
-# Survey 2026-10-07 (web search + URLs supplied by the group; feeds not yet probed live).
+# Survey 2026-10-07 (web search + URLs supplied by the group); probed live 2026-10-07.
 id: mit
 name: Massachusetts Institute of Technology
 country: US
@@ -16,6 +16,7 @@ series:
     notes: >-
       WordPress; current and past semesters on one page (date, speaker, affiliation,
       title). Department calendar at physics.mit.edu/events/.
+      Probe 2026-10-07: series page returned HTTP 403 (server refuses automated clients).
   - id: mit-mki-astrophysics-colloquium
     name: MKI Astrophysics Colloquium
     type: colloquium
@@ -25,6 +26,7 @@ series:
       list_url: https://www.space.mit.edu/events/event-type/astrophysics-colloquium/
     domains: [www.space.mit.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       WordPress with an "event-type" taxonomy; paginated /page/N/. One text extraction
       reported The Events Calendar (tribe), another found no tribe markers: probe decides
@@ -38,6 +40,7 @@ series:
       list_url: https://www.space.mit.edu/events/
     domains: [www.space.mit.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Two visiting researchers per session. Event type "Monday Afternoon Science Talks"
       exists on /events/; its /events/event-type/<slug>/ URL is TBD.

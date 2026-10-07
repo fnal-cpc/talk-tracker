@@ -102,7 +102,11 @@ def cmd_probe(args: argparse.Namespace) -> int:
         _err(str(exc))
         return EXIT_INVALID
     wanted = set(args.series or [])
-    targets = [s for _, s in reg.iter_series() if not wanted or s.id in wanted]
+    targets = [
+        s
+        for _, s in reg.iter_series()
+        if (not wanted or s.id in wanted) and not (args.unverified and s.verified)
+    ]
     unknown = wanted - {s.id for s in targets}
     if unknown:
         _err(f"unknown series: {', '.join(sorted(unknown))}")
@@ -159,6 +163,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s.add_argument("--series", metavar="ID", action="append", help="limit to series (repeatable)")
     s.add_argument("--no-check-feeds", action="store_true", help="do not fetch candidate feeds")
+    s.add_argument("--unverified", action="store_true", help="only series with verified: false")
     s.add_argument("--delay", type=float, default=2.0, help="seconds between requests per host")
     s.add_argument("--json", metavar="PATH", help="also write full results as JSON")
     s.set_defaults(func=cmd_probe)

@@ -29,7 +29,8 @@ def test_wordpress_tribe():
     k = _kinds(d)
     assert ("tribe", "https://events.example.org/wp-json/tribe/events/v1/events") in k
     assert ("ical", "https://events.example.org/events/?ical=1") in k
-    assert ("rss", "https://events.example.org/feed/") in k
+    assert ("site-rss", "https://events.example.org/feed/") in k  # posts, not events
+    assert not any("comments/feed" in u or "wp-json/wp/v2" in u for _, u in k)
     assert d.suggested_adapter == "tribe"
 
 
@@ -150,3 +151,60 @@ def test_probe_series_registry_feed_and_http_error():
     r = probe_series(_series(url="https://www.example.org/missing"), fetcher)
     assert r.error == "HTTP 404" and r.detection is None
     assert "HTTP 404" in render_markdown([r])
+
+
+def test_registry_source_checked_when_page_blocked():
+    fetcher = FakeFetcher({"https://indico.example.com/export/categ/7.json": b'{"results": [{}]}'})
+    s = _series(
+        adapter="indico",
+        params={"base_url": "https://indico.example.com", "category": 7},
+        domains=["indico.example.com"],
+    )
+    r = probe_series(s, fetcher)
+    assert r.error == "HTTP 404"
+    assert r.detection.feeds[0].source == "registry"
+    assert r.detection.feeds[0].check == "ok json (1 items)"
+    assert r.detection.suggested_adapter == "indico"
+    assert "page: HTTP 404" in render_markdown([r])
+
+
+def test_confirmed_registry_source_beats_preference():
+    page = (P / "indico_link.html").read_bytes()
+    fetcher = FakeFetcher(
+        {
+            "https://www.example.org/events/": page,
+            "https://t.example.org/wp-json/tribe/events/v1/events?per_page=5": b'{"events": []}',
+            "https://indico.example.com/export/categ/1432.json": b'{"results": [{}]}',
+        }
+    )
+    s = _series(
+        adapter="tribe", params={"base_url": "https://t.example.org"}, domains=["t.example.org"]
+    )
+    assert probe_series(s, fetcher).detection.suggested_adapter == "tribe"
+
+
+ONE_EVENT_ICS = b"BEGIN:VCALENDAR\nBEGIN:VEVENT\nEND:VEVENT"
+
+
+def test_single_event_ics_not_suggested():
+    page = b'<html><body><a href="/calendar/talk-12?ical">add</a></body></html>'
+    fetcher = FakeFetcher(
+        {
+            "https://www.example.org/events/": page,
+            "https://www.example.org/calendar/talk-12?ical": ONE_EVENT_ICS,
+        }
+    )
+    r = probe_series(_series(), fetcher)
+    assert r.detection.feeds[0].check == "ok ical (1 events)"
+    assert r.detection.suggested_adapter == "html"
+
+
+def test_robots_block_reported():
+    class Blocked(FakeFetcher):
+        def get(self, url):
+            raise PermissionError(f"robots.txt disallows {url}")
+
+    s = _series(params={"ics_url": "https://cal.example.org/a.ics"}, domains=["cal.example.org"])
+    r = probe_series(s, Blocked({}))
+    assert r.error == "blocked by robots.txt"
+    assert r.detection.feeds[0].check == "blocked by robots.txt"
