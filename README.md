@@ -4,8 +4,9 @@ Finds talks given by members of a research group at physics and astronomy colloq
 seminars, by reading the public calendars of seminar series, and produces a monthly
 "Invited Talks" list. See [PLAN.md](PLAN.md) for the design and milestones.
 
-Status: **M1 (pilot survey)**. The registry lists 35 series at 10 institutions: 24 verified
-against the live sites, 5 unsupported, 6 awaiting re-probe (see [docs/survey.md](docs/survey.md)). `validate`, `domains`, `list` and `probe`
+Status: **M1 complete (pilot survey)**. The registry lists 35 series at 10 institutions:
+30 with sources confirmed against the live sites, 5 unsupported (see
+[docs/survey.md](docs/survey.md)). `validate`, `domains`, `list` and `probe`
 work; `scrape`, `report`, `check`, `backfill` and `evaluate` are stubs that exit with
 status 2.
 

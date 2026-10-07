@@ -13,6 +13,7 @@ series:
       list_url: https://physics.caltech.edu/events/seminar-calendar
     domains: [physics.caltech.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Caltech division calendars share one CMS (also pma/pva/qse.caltech.edu). Listing
       supports /calendar/filter?...&series=<id>&past=1; each event has <url>?ical.
@@ -20,6 +21,8 @@ series:
       Probe 2026-10-07: same CMS as www.astro.caltech.edu, whose series feed
       /calendar/ical?series=<id> works; page shows only per-event ?ical links. Find the
       physics.caltech.edu series id, then switch to ical.
+      Re-probe 2026-10-07: shared listing loads (html confirmed); the page offers only per-
+      event iCal links. Upgrade to /calendar/ical?series=<id> once the series id is known.
   - id: caltech-astronomy-colloquium
     name: Astronomy Colloquium
     type: colloquium
@@ -42,8 +45,11 @@ series:
       list_url: https://physics.caltech.edu/events/seminar-calendar
     domains: [physics.caltech.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Listed in the physics seminar calendar as "TAPIR Seminar Series"; series id TBD.
       Probe 2026-10-07: same CMS as www.astro.caltech.edu, whose series feed
       /calendar/ical?series=<id> works; page shows only per-event ?ical links. Find the
       physics.caltech.edu series id, then switch to ical.
+      Re-probe 2026-10-07: shared listing loads (html confirmed); the page offers only per-
+      event iCal links. Upgrade to /calendar/ical?series=<id> once the series id is known.

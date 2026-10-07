@@ -85,6 +85,8 @@ def test_failed_feed_check_is_skipped_in_suggestion():
     for f in d.feeds:
         if f.kind == "indico":
             f.check = "HTTP 403"
+        elif f.kind == "ical":
+            f.check = "ok ical (3 events)"
     from talk_tracker.probe import suggest_adapter
 
     assert suggest_adapter(d) == "ical"
@@ -208,3 +210,13 @@ def test_robots_block_reported():
     r = probe_series(s, Blocked({}))
     assert r.error == "blocked by robots.txt"
     assert r.detection.feeds[0].check == "blocked by robots.txt"
+
+
+def test_unchecked_overflow_not_suggested():
+    links = "".join(f'<a href="/calendar/talk-{i}?ical">add</a>' for i in range(6))
+    pages = {"https://www.example.org/events/": f"<html><body>{links}</body></html>".encode()}
+    for i in range(6):
+        pages[f"https://www.example.org/calendar/talk-{i}?ical"] = ONE_EVENT_ICS
+    r = probe_series(_series(), FakeFetcher(pages))
+    assert [f.check for f in r.detection.feeds].count(None) == 3  # overflow, unchecked
+    assert r.detection.suggested_adapter == "html"

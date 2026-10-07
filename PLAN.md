@@ -1,6 +1,6 @@
 # talk-tracker — Build Plan
 
-Status: v1.5 (2026-10-07) — decisions in §0 (incl. 403 handling and the robots.txt exception for public calendar feeds); M0 complete; M1: 29/35 series settled (24 verified, 5 unsupported), 6 awaiting re-probe (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.6 (2026-10-07) — decisions in §0 (incl. 403 handling and the robots.txt exception for public calendar feeds); M0 and M1 complete (35 series: 30 with confirmed sources, 5 unsupported); next: M2 adapters (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
 
 ## 0. Resolved decisions (2026-10-06)
 
@@ -311,7 +311,7 @@ Decisions and deviations made during M0:
 
 Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
 
-### M1 — pilot survey (2026-10-07; 6 series awaiting re-probe)
+### M1 — pilot survey (complete 2026-10-07)
 Delivered: 10 institution files (35 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
 
 How the survey was done: the Claude workspace cannot reach university or lab sites from its shell, and its page fetcher returns extracted text without `<head>`/feed links (and sometimes stale copies). Assignments were therefore made from web search and page text. All series are `verified: false`. The exit criterion ("every pilot series has an adapter assignment or is marked unsupported") is met provisionally. M1 is complete once `talk-tracker probe` has been run from a normal network and its results applied.
@@ -341,4 +341,17 @@ Decisions applied (2026-10-07, §0.7–0.8):
 - `unsupported` (no alternative source found): MIT Harris Physics Colloquium, Princeton Hamilton Colloquium, Princeton Astroparticle Seminar, Michigan HEP-Astro (group id unknown). ITC Luncheon is also unsupported and set to `active: false`, because CfA states the lunches are not being held.
 - Alternative sources kept: Michigan Physics uses events.umich.edu group 3804, not the refused LSA page. Harvard Physics uses its public Google Calendar feed under the new robots exception.
 - Unsupported series count as settled (`verified: true`). The remaining 6 unverified series are Caltech Physics/TAPIR (series ids), CIERA ×2, Harvard Physics and Michigan Physics. They will be settled by `talk-tracker probe --unverified`.
+
+Re-probe of the remaining 6 (2026-10-07) closed M1:
+- Harvard Physics: public Google Calendar OK (574 events). Michigan Physics: events.umich.edu group 3804 OK.
+- CIERA Interdisciplinary: calendar 4336 answers with 0 upcoming events (check the archive in M2). CIERA Astrophysics Seminar moved to `html` on its program page.
+- Caltech Physics and TAPIR: `html` on the shared listing; the series-level iCal feed awaits the series ids.
+- Probe fix: unchecked overflow candidates no longer drive the suggestion when other candidates were checked.
+
+Exit criterion met: every pilot series has a confirmed adapter or is `unsupported` with a reason.
+
+Notes for M2:
+- Adapters needed by the registry: `html` (20 series, the bulk of the work), `ical` (4), `indico` (2), `planitpurple` (2), `tribe` (1), `localist` (1). `rss` and `browser` are not needed for the pilot.
+- `html` listings that mix several named series (UChicago A&A/KICP, IAS calendar, Caltech physics calendar, MKI) need a per-entry series-label filter.
+- Fetching must use `talk_tracker.policy` (robots exception for public calendar feeds).
 

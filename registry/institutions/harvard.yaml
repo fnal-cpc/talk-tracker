@@ -13,6 +13,7 @@ series:
       ics_url: https://calendar.google.com/calendar/ical/431lpisdro6mh8clb6df1rl9p0%40group.calendar.google.com/public/basic.ics
     domains: [calendar.google.com]
     keeps_past_events: true
+    verified: true
     notes: >-
       Page embeds Google Calendar 431lpisdro6mh8clb6df1rl9p0@group.calendar.google.com;
       ics_url is the standard public-feed form of that id (not yet fetched).
@@ -21,6 +22,7 @@ series:
       this source conflicts with the robots policy.
       Decision 2026-10-07: public calendar feeds are exempt from robots.txt (PLAN.md §0.8),
       so the Google Calendar feed is the source; re-probe to verify.
+      Re-probe 2026-10-07: public Google Calendar feed OK (574 events, multi-year history).
   - id: harvard-cfa-colloquium
     name: CfA Colloquium
     type: colloquium

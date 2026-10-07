@@ -30,21 +30,28 @@ series:
       cal: 4336
     domains: [planitpurple.northwestern.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Probe 2026-10-07: program page is WordPress with no PlanIt Purple calendar link; the
       configured calendar was not tested by this probe version (re-run).
+      Re-probe 2026-10-07: calendar 4336 xmlfeed answers but has 0 upcoming events. In M2
+      query with archive=1; if it is still empty, mark the series inactive.
   - id: northwestern-ciera-astrophysics-seminar
     name: CIERA Astrophysics Seminar
     type: seminar
     url: https://ciera.northwestern.edu/programs/astrophysics-seminars
-    adapter: planitpurple
+    adapter: html
     params:
-      base_url: https://planitpurple.northwestern.edu
-    domains: [planitpurple.northwestern.edu]
+      list_url: https://ciera.northwestern.edu/programs/astrophysics-seminars
+    domains: [ciera.northwestern.edu]
     keeps_past_events: true
+    verified: true
     notes: >-
       Tuesdays 11 am. Events link to planitpurple.northwestern.edu/event/<id>; calendar id
       not yet identified (TODO: probe). CIERA's visitor database
       (ciera.northwestern.edu/visits/) lists past speakers.
       Probe 2026-10-07: program page is WordPress with no PlanIt Purple calendar link; the
       configured calendar was not tested by this probe version (re-run).
+      Re-probe 2026-10-07: no PlanIt Purple calendar linked; the program page itself lists
+      upcoming seminars (date, speaker, title) and loads, so it is the source (html). Switch
+      to planitpurple if the calendar id turns up.

@@ -284,9 +284,13 @@ _ADAPTER_FOR = {
 def suggest_adapter(det: Detection) -> str:
     """Pick the most structured adapter among the candidates (checked feeds first)."""
 
+    any_checked = any(f.check is not None for f in det.feeds)
+
     def usable(f: Feed) -> bool:
         if f.check is None:
-            return True
+            # unchecked candidates count only when nothing was checked (--no-check-feeds);
+            # otherwise they are the overflow beyond MAX_CHECKS_PER_KIND
+            return not any_checked
         # a .ics with exactly one event is a per-event "add to calendar" link, not a feed
         return f.check.startswith("ok") and "(1 events)" not in f.check
 
