@@ -1,0 +1,39 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: caltech
+name: California Institute of Technology
+country: US
+timezone: America/Los_Angeles
+series:
+  - id: caltech-physics-colloquium
+    name: Physics Colloquium
+    type: colloquium
+    url: https://physics.caltech.edu/events/seminar-calendar
+    adapter: html
+    params:
+      list_url: https://physics.caltech.edu/events/seminar-calendar
+    domains: [physics.caltech.edu]
+    keeps_past_events: true
+    notes: >-
+      Caltech division calendars share one CMS (also pma/pva/qse.caltech.edu). Listing
+      supports /calendar/filter?...&series=<id>&past=1; each event has <url>?ical.
+      Series id for Physics Colloquium to be found by probe.
+  - id: caltech-astronomy-colloquium
+    name: Astronomy Colloquium
+    type: colloquium
+    url: https://www.astro.caltech.edu/calendar/filter?date_start=&date_end=&type=all&search=&past=0&mc=1&series=22
+    adapter: html
+    params:
+      list_url: https://www.astro.caltech.edu/calendar/filter?date_start=&date_end=&type=all&search=&past=0&mc=1&series=22
+    domains: [www.astro.caltech.edu]
+    keeps_past_events: true
+    notes: Series id 22 (from an event page). Per-event iCal at <event url>?ical.
+  - id: caltech-tapir-seminar
+    name: TAPIR Seminar
+    type: seminar
+    url: https://physics.caltech.edu/events/seminar-calendar
+    adapter: html
+    params:
+      list_url: https://physics.caltech.edu/events/seminar-calendar
+    domains: [physics.caltech.edu]
+    keeps_past_events: true
+    notes: Listed in the physics seminar calendar as "TAPIR Seminar Series"; series id TBD.

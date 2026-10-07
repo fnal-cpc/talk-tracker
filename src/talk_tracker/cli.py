@@ -1,7 +1,7 @@
 """Command-line interface (PLAN.md §5.8).
 
-Implemented in M0: ``validate``, ``domains``. Other commands are registered with their
-final options and exit with status 2 until their milestone lands.
+Implemented: ``validate``, ``domains`` (M0); ``list``, ``probe`` (M1). Other commands are
+registered with their final options and exit with status 2 until their milestone lands.
 """
 
 from __future__ import annotations
@@ -77,6 +77,51 @@ def cmd_domains(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_list(args: argparse.Namespace) -> int:
+    try:
+        reg = load_registry(args.registry)
+    except RegistryError as exc:
+        _err(str(exc))
+        return EXIT_INVALID
+    print("| series | institution | type | adapter | verified | keeps past | url |")
+    print("|---|---|---|---|---|---|---|")
+    for inst, s in reg.iter_series(active_only=args.active_only):
+        print(
+            f"| {s.id} | {inst.name} | {s.type} | {s.adapter} | "
+            f"{'yes' if s.verified else 'no'} | {str(s.keeps_past_events).lower()} | {s.url} |"
+        )
+    return EXIT_OK
+
+
+def cmd_probe(args: argparse.Namespace) -> int:
+    from .probe import Fetcher, probe_series, render_markdown
+
+    try:
+        reg = load_registry(args.registry)
+    except RegistryError as exc:
+        _err(str(exc))
+        return EXIT_INVALID
+    wanted = set(args.series or [])
+    targets = [s for _, s in reg.iter_series() if not wanted or s.id in wanted]
+    unknown = wanted - {s.id for s in targets}
+    if unknown:
+        _err(f"unknown series: {', '.join(sorted(unknown))}")
+        return EXIT_INVALID
+    fetcher = Fetcher(delay=args.delay)
+    results = []
+    for i, s in enumerate(targets, 1):
+        _err(f"[{i}/{len(targets)}] {s.id}")
+        results.append(probe_series(s, fetcher, check_feeds=not args.no_check_feeds))
+    print(render_markdown(results), end="")
+    if args.json:
+        import json
+
+        Path(args.json).write_text(
+            json.dumps([r.to_dict() for r in results], indent=2) + "\n", encoding="utf-8"
+        )
+    return EXIT_OK
+
+
 def cmd_pending(args: argparse.Namespace) -> int:
     _err(f"talk-tracker {args.command}: not implemented yet (milestone {_PENDING[args.command]})")
     return EXIT_NOT_IMPLEMENTED
@@ -104,6 +149,19 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("domains", help="print the domains the registry fetches from")
     s.add_argument("--active-only", action="store_true", help="only series with active: true")
     s.set_defaults(func=cmd_domains)
+
+    s = sub.add_parser("list", help="print the registry as a markdown table")
+    s.add_argument("--active-only", action="store_true")
+    s.set_defaults(func=cmd_list)
+
+    s = sub.add_parser(
+        "probe", help="survey: detect platform and feeds of series pages (network access)"
+    )
+    s.add_argument("--series", metavar="ID", action="append", help="limit to series (repeatable)")
+    s.add_argument("--no-check-feeds", action="store_true", help="do not fetch candidate feeds")
+    s.add_argument("--delay", type=float, default=2.0, help="seconds between requests per host")
+    s.add_argument("--json", metavar="PATH", help="also write full results as JSON")
+    s.set_defaults(func=cmd_probe)
 
     s = sub.add_parser("scrape", help="fetch registered series into the archive")
     s.add_argument("--series", metavar="ID", action="append", help="limit to series (repeatable)")

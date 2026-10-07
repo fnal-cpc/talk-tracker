@@ -1,0 +1,28 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: mit
+name: Massachusetts Institute of Technology
+country: US
+timezone: America/New_York
+series:
+  - id: mit-mki-astrophysics-colloquium
+    name: MKI Astrophysics Colloquium
+    type: colloquium
+    url: https://space.mit.edu/events/
+    adapter: tribe
+    params:
+      base_url: https://space.mit.edu
+    domains: [space.mit.edu]
+    keeps_past_events: true
+    notes: >-
+      WordPress + The Events Calendar; paginated /events/page/N/. One calendar for all MKI
+      series; filter by tribe category (slug TBD by probe). Also www.space.mit.edu.
+  - id: mit-mki-science-talks
+    name: MKI Monday Afternoon Science Talks
+    type: seminar
+    url: https://space.mit.edu/events/
+    adapter: tribe
+    params:
+      base_url: https://space.mit.edu
+    domains: [space.mit.edu]
+    keeps_past_events: true
+    notes: Two visiting researchers per session; same calendar as the colloquium.

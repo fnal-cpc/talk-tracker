@@ -128,3 +128,40 @@ def test_fixture_files_are_schema_examples():
     for p in (FIXTURES / "registry" / "valid" / "institutions").glob("*.yaml"):
         for d in yaml.safe_load(p.read_text())["series"]:
             assert all(dom.endswith((".example.org", ".example.com")) for dom in d["domains"])
+
+
+# ---------------------------------------------------------------- pilot registry (M1)
+
+PILOT = {
+    "uchicago",
+    "fnal",
+    "northwestern",
+    "stanford",
+    "berkeley",
+    "caltech",
+    "princeton",
+    "harvard",
+    "mit",
+    "umich",
+}
+
+
+def test_pilot_registry_complete():
+    reg = load_registry(REPO / "registry")
+    assert {i.id for i in reg.institutions} == PILOT
+    for inst in reg.institutions:
+        assert len(inst.series) >= 2, inst.id
+
+
+def test_pilot_series_have_adapter_params():
+    reg = load_registry(REPO / "registry")
+    for _, s in reg.iter_series():
+        if s.adapter == "html":
+            assert "list_url" in s.params, s.id
+        elif s.adapter in ("indico",):
+            assert {"base_url", "category"} <= s.params.keys(), s.id
+        elif s.adapter in ("tribe", "localist", "planitpurple"):
+            assert "base_url" in s.params, s.id
+        if not s.verified:
+            # unverified assignments must say what is known or still to do
+            assert s.notes or s.params, s.id

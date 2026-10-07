@@ -1,0 +1,49 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: umich
+name: University of Michigan
+country: US
+timezone: America/Detroit
+series:
+  - id: umich-physics-colloquium
+    name: Physics Department Colloquium
+    type: colloquium
+    url: https://lsa.umich.edu/physics/news-events/seminars-colloquia/department-colloquia.html
+    adapter: ical
+    params:
+      ics_url: https://events.umich.edu/group/3804/ical
+      rss_url: https://events.umich.edu/group/3804/rss?v=2&html_output=true
+    domains: [events.umich.edu]
+    keeps_past_events: true
+    notes: >-
+      Happening @ Michigan group 3804 (RSS link on the page). ics_url follows the documented
+      "append format to listing" pattern but has not been fetched. JSON also documented
+      (/list/json?filter=sponsors:<id>&range=AtoB&v=2).
+  - id: umich-astronomy-colloquium
+    name: Astronomy Colloquium
+    type: colloquium
+    url: https://lsa.umich.edu/physics/news-events/seminars-colloquia/astronomy-colloquia.html
+    adapter: ical
+    params:
+      ics_url: https://events.umich.edu/group/1178/ical
+    domains: [events.umich.edu]
+    keeps_past_events: true
+    notes: Happening @ Michigan group 1178 = Department of Astronomy (all astronomy events).
+  - id: umich-hep-astro-seminar
+    name: HEP-Astro Seminar
+    type: seminar
+    url: https://lsa.umich.edu/physics/news-events/seminars-colloquia/hep-astro-seminars.html
+    adapter: ical
+    params: {}
+    domains: [events.umich.edu]
+    keeps_past_events: true
+    notes: Page has an events.umich.edu feed; group id TBD (probe).
+  - id: umich-cosmology-seminar
+    name: UM Cosmology Group Seminar (LITP)
+    type: seminar
+    url: https://lsa.umich.edu/litp/news-events/all-events/seminars/um-cosmology-group-seminars.html
+    adapter: html
+    params:
+      list_url: https://lsa.umich.edu/litp/news-events/all-events/seminars/um-cosmology-group-seminars.html
+    domains: [lsa.umich.edu]
+    keeps_past_events: true
+    notes: Fridays 11 am; full academic-year list on one page.

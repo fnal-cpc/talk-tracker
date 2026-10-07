@@ -32,7 +32,7 @@
           "description": "Omit to derive from type (colloquium, seminar, lecture => invited)."
         },
         "url": { "type": "string", "pattern": "^https?://", "description": "Human-facing series page (evidence link)." },
-        "adapter": { "enum": ["ical", "localist", "tribe", "indico", "rss", "html", "browser", "unsupported"] },
+        "adapter": { "enum": ["ical", "localist", "tribe", "indico", "rss", "html", "browser", "planitpurple", "unsupported"] },
         "params": { "type": "object", "description": "Adapter-specific parameters." },
         "domains": {
           "type": "array",
@@ -43,6 +43,10 @@
         },
         "keeps_past_events": { "enum": [true, false, "unknown"] },
         "active": { "type": "boolean" },
+        "verified": {
+          "type": "boolean",
+          "description": "True once the adapter/feed assignment has been confirmed against the live site (e.g. with talk-tracker probe)."
+        },
         "notes": { "type": "string" }
       },
       "if": { "properties": { "adapter": { "const": "unsupported" } } },

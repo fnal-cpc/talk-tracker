@@ -1,6 +1,6 @@
 # talk-tracker — Build Plan
 
-Status: v1.2 (2026-10-07) — scope decisions resolved (see §0); M0 complete (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
+Status: v1.3 (2026-10-07) — scope decisions resolved (see §0); M0 complete; M1 survey done from search, awaiting live probe (see §12). Owner: Fermilab DM & DE group (`fnal-cpc/talk-tracker`).
 
 ## 0. Resolved decisions (2026-10-06)
 
@@ -112,6 +112,7 @@ series:
     domains: [events.uchicago.edu]
     keeps_past_events: unknown  # true | false | unknown (determined during survey)
     active: true
+    verified: false             # true once the feed/adapter is confirmed live (talk-tracker probe)
     notes: ""
 ```
 
@@ -181,6 +182,7 @@ Each adapter implements `fetch(series, start, end) -> list[RawEvent]` and raises
 | `rss` | RSS/Atom | Fallback for feeds without dates in structured form |
 | `html` | CSS selectors in `params` | For static pages; selectors for item, date, speaker, title, link |
 | `browser` | Playwright + `html` selectors | JS-rendered pages; Chromium already available |
+| `planitpurple` | `/xmlfeed?cal=<id>&start=mm-dd-yyyy&end=mm-dd-yyyy` | Northwestern PlanIt Purple (added in M1); `archive=1` reaches 4 years back |
 
 ### 5.3 Parsing (`parse.py`)
 - Many feeds put speaker and affiliation in the title (e.g. `"Colloquium: Jane Doe (MIT) – Dark Matter..."`). Ordered list of regex patterns plus a per-series override pattern in `params.speaker_pattern`.
@@ -217,6 +219,8 @@ plus a coverage footer: number of series checked, number failing, number with no
 ```
 talk-tracker validate [--roster PATH]      # schema-check registry (and a roster, if given)
 talk-tracker domains                       # print allowlist domains
+talk-tracker list                          # registry as a markdown table
+talk-tracker probe [--series ID] [--json PATH]   # survey: detect platform/feeds of series pages
 talk-tracker scrape [--series ID] [--from DATE --to DATE] [--cache]
 talk-tracker report --month YYYY-MM --roster PATH [--min-confidence medium]
 talk-tracker check                         # feed health
@@ -303,4 +307,17 @@ Decisions and deviations made during M0:
 - No license chosen yet (`pyproject.toml` has none) — to be decided by the owners before the repo is public.
 
 Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
+
+### M1 — pilot survey (2026-10-07; live confirmation pending)
+Delivered: 10 institution files (32 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
+
+How the survey was done: the Claude workspace cannot reach university or lab sites from its shell, and its page fetcher returns extracted text without `<head>`/feed links (and sometimes stale copies). Assignments were therefore made from web search and page text. All series are `verified: false`. The exit criterion ("every pilot series has an adapter assignment or is marked unsupported") is met provisionally. M1 is complete once `talk-tracker probe` has been run from a normal network and its results applied.
+
+Decisions and deviations made during M1:
+- New registry field `verified` (default false).
+- New adapter `planitpurple` (Northwestern), to be implemented in M2 alongside the others.
+- A registry series may be a listing page that mixes several named series (e.g. UChicago A&A/KICP colloquia, IAS astrophysics calendar); the per-event series label will need to be parsed in M2.
+- KIPAC tea talks and ITC luncheons are registered as `type: other` (not invited by default) so that they show up only for review.
+- `html` with `params.list_url` is used as the placeholder where no feed was identified: 19 of 32 series. The probe is expected to move some of them to structured adapters.
+- Not registered (pages not found by search): Princeton Physics Colloquium, MIT Physics Colloquium. See `docs/survey.md`.
 

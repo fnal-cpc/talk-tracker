@@ -1,0 +1,43 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: uchicago
+name: University of Chicago
+country: US
+timezone: America/Chicago
+series:
+  - id: uchicago-physics-colloquium
+    name: Physics Colloquium
+    type: colloquium
+    url: https://physics.uchicago.edu/events/category/colloquia-and-lectures/
+    adapter: html
+    params:
+      list_url: https://physics.uchicago.edu/events/category/colloquia-and-lectures/
+    domains: [physics.uchicago.edu]
+    keeps_past_events: true
+    notes: >-
+      Category "Colloquia and Lectures" (also contains other lectures). Past event pages
+      remain at /events/event/<n>?past=y. No feed link seen in page text; same events CMS
+      as astrophysics.uchicago.edu.
+  - id: uchicago-astro-colloquia
+    name: Astronomy & Astrophysics / KICP Colloquia
+    type: colloquium
+    url: https://astrophysics.uchicago.edu/events/category/colloquia/
+    adapter: html
+    params:
+      list_url: https://astrophysics.uchicago.edu/events/category/colloquia/
+      past_url: https://astrophysics.uchicago.edu/events/past-events/
+    domains: [astrophysics.uchicago.edu]
+    keeps_past_events: true
+    notes: >-
+      One listing for KICP Colloquium, Astronomy Colloquium and named lectures (e.g.
+      Wasserburg Lecture); the series label is in each entry. Past events paginated as
+      /events/past-events/P<offset>/ (offsets 10..420+ seen), i.e. multi-year archive.
+  - id: uchicago-astro-seminars
+    name: KICP Seminar
+    type: seminar
+    url: https://astrophysics.uchicago.edu/events/category/seminars
+    adapter: html
+    params:
+      list_url: https://astrophysics.uchicago.edu/events/category/seminars
+    domains: [astrophysics.uchicago.edu]
+    keeps_past_events: true
+    notes: Entries read "<Speaker> (<Affil>) will give the KICP Seminar on <m/d>".

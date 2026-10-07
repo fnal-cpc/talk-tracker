@@ -4,8 +4,10 @@ Finds talks given by members of a research group at physics and astronomy colloq
 seminars, by reading the public calendars of seminar series, and produces a monthly
 "Invited Talks" list. See [PLAN.md](PLAN.md) for the design and milestones.
 
-Status: **M0 (skeleton)**. `validate` and `domains` work; `scrape`, `report`, `check`,
-`backfill` and `evaluate` are stubs that exit with status 2.
+Status: **M1 (pilot survey)**. The registry lists 32 series at 10 institutions, all still
+unverified (see [docs/survey.md](docs/survey.md)). `validate`, `domains`, `list` and `probe`
+work; `scrape`, `report`, `check`, `backfill` and `evaluate` are stubs that exit with
+status 2.
 
 ## Install
 
@@ -22,7 +24,13 @@ Requires Python ≥ 3.11.
 talk-tracker validate                          # check registry/institutions/*.yaml
 talk-tracker validate --roster group.txt       # ...and a roster (prints counts only)
 talk-tracker domains [--active-only]           # hosts the scraper will contact
+talk-tracker list                              # registry as a markdown table
+talk-tracker probe [--series ID] [--json out.json]  # detect platform/feeds (network)
 ```
+
+`probe` fetches each series page and the feeds it finds, sequentially, at most one request
+per host every 2 s, respecting `robots.txt`. It prints a table comparing the registry's
+adapter with the suggested one (⚠ marks a disagreement).
 
 The registry directory defaults to `./registry`; override with `--registry DIR` or
 `$TALK_TRACKER_REGISTRY`.

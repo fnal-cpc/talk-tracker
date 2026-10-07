@@ -1,0 +1,59 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live). Includes SLAC and KIPAC.
+id: stanford
+name: Stanford University / SLAC / KIPAC
+country: US
+timezone: America/Los_Angeles
+series:
+  - id: stanford-physics-colloquium
+    name: Applied Physics/Physics Colloquium
+    type: colloquium
+    url: https://events.stanford.edu/department/applied_physicsphysics_colloquium
+    adapter: localist
+    params:
+      base_url: https://events.stanford.edu
+      department: applied_physicsphysics_colloquium
+    domains: [events.stanford.edu]
+    keeps_past_events: true
+    notes: >-
+      events.stanford.edu is Localist (localist meta tags; per-event .ics). Department
+      filter id to be resolved via /api/2/events/filters.
+  - id: stanford-kipac-astrophysics-colloquium
+    name: KIPAC Astrophysics Colloquium
+    type: colloquium
+    url: https://kipac.stanford.edu/events/astrophysics-colloquium-0
+    adapter: html
+    params:
+      list_url: https://kipac.stanford.edu/events/astrophysics-colloquium-0
+    domains: [kipac.stanford.edu]
+    keeps_past_events: true
+    notes: Drupal 11; past events at /events/past-events. Check whether also on Localist.
+  - id: stanford-kipac-seminar
+    name: KIPAC Seminar
+    type: seminar
+    url: https://kipac.stanford.edu/events/kipac-seminar-0
+    adapter: html
+    params:
+      list_url: https://kipac.stanford.edu/events/kipac-seminar-0
+    domains: [kipac.stanford.edu]
+    keeps_past_events: true
+  - id: stanford-kipac-tea-talk
+    name: KIPAC Tea Talk
+    type: other
+    url: https://kipac.stanford.edu/events/kipac-tea-talk-0
+    adapter: html
+    params:
+      list_url: https://kipac.stanford.edu/events/kipac-tea-talk-0
+    domains: [kipac.stanford.edu]
+    keeps_past_events: true
+    notes: Short talks by visitors and locals; not invited by default (type other).
+  - id: stanford-slac-colloquium
+    name: SLAC Colloquium
+    type: colloquium
+    url: https://colloquium.slac.stanford.edu/upcoming-events
+    adapter: html
+    params:
+      list_url: https://colloquium.slac.stanford.edu/upcoming-events
+      past_url: https://colloquium.slac.stanford.edu/past-events
+    domains: [colloquium.slac.stanford.edu]
+    keeps_past_events: true
+    notes: Drupal 10. Mondays 4:30 pm.

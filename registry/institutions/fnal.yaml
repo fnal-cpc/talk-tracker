@@ -1,0 +1,46 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: fnal
+name: Fermi National Accelerator Laboratory
+country: US
+timezone: America/Chicago
+series:
+  - id: fnal-colloquium
+    name: Fermilab Colloquium
+    type: colloquium
+    url: https://events.fnal.gov/colloquium/
+    adapter: html
+    params:
+      list_url: https://events.fnal.gov/colloquium/
+    domains: [events.fnal.gov]
+    keeps_past_events: true
+    notes: >-
+      WordPress. Yearly archives at /colloquium/fermilab-colloquium-calendar-archive-<YEAR>/
+      (2015-2026) plus older archive pages. Probe for a WordPress events REST API (tribe)
+      before writing selectors.
+  - id: fnal-jetp-seminar
+    name: Joint Experimental-Theoretical Physics Seminar (Wine & Cheese)
+    type: seminar
+    url: https://theory.fnal.gov/jetp/
+    adapter: indico
+    params:
+      base_url: https://indico.fnal.gov
+      category: 1432
+    domains: [indico.fnal.gov]
+    keeps_past_events: true
+    notes: >-
+      theory.fnal.gov/jetp links Indico category 1432 and its events.ics. Also mirrored on
+      researchseminars.org (series FERMILABJET, has /ics). Older years (2006-2020) on
+      theory.fnal.gov/jetp-seminar/jetp<YEAR>.
+  - id: fnal-cpc-seminar
+    name: Cosmic Physics Center Seminar
+    type: seminar
+    url: https://astro.fnal.gov/events/seminars/
+    adapter: indico
+    params:
+      base_url: https://indico.fnal.gov
+      category: 1639
+    domains: [indico.fnal.gov]
+    keeps_past_events: true
+    notes: >-
+      Mondays 2 pm. Schedule maintained on Indico category 1639 (linked from the page).
+      Older years on astro.fnal.gov/events/event-archive/seminar-archive-<YEAR>/ (2013-2019).

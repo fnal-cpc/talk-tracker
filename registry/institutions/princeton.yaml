@@ -1,0 +1,28 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live). Includes IAS.
+id: princeton
+name: Princeton University / Institute for Advanced Study
+country: US
+timezone: America/New_York
+series:
+  - id: princeton-ias-joint-astrophysics-colloquium
+    name: Joint IAS / Princeton University Astrophysics Colloquium
+    type: colloquium
+    url: https://www.ias.edu/sns/astrophysics/joint-iaspu-astrophysics-colloquium
+    adapter: html
+    params:
+      list_url: https://www.ias.edu/sns/astrophysics/joint-iaspu-astrophysics-colloquium
+    domains: [www.ias.edu]
+    keeps_past_events: true
+    notes: Drupal 11, paginated (?page=N). Archive at /sns/astrophysics/seminars/colloquium/all.
+  - id: princeton-ias-astrophysics-seminars
+    name: IAS Astrophysics Calendar (seminars)
+    type: seminar
+    url: https://www.ias.edu/sns/events/astrophysics
+    adapter: html
+    params:
+      list_url: https://www.ias.edu/sns/events/astrophysics
+    domains: [www.ias.edu]
+    keeps_past_events: true
+    notes: >-
+      Combined calendar (IAS Astrophysics Seminar, informal seminars, joint colloquium);
+      paginated (?page=N, 13+ pages seen). Entries need per-event series labels.

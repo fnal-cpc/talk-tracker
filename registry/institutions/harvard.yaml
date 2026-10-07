@@ -1,0 +1,38 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live). Includes CfA.
+id: harvard
+name: Harvard University / Center for Astrophysics
+country: US
+timezone: America/New_York
+series:
+  - id: harvard-physics-colloquium
+    name: Physics Monday Colloquium
+    type: colloquium
+    url: https://www.physics.harvard.edu/colloq
+    adapter: ical
+    params:
+      ics_url: https://calendar.google.com/calendar/ical/431lpisdro6mh8clb6df1rl9p0%40group.calendar.google.com/public/basic.ics
+    domains: [calendar.google.com]
+    keeps_past_events: true
+    notes: >-
+      Page embeds Google Calendar 431lpisdro6mh8clb6df1rl9p0@group.calendar.google.com;
+      ics_url is the standard public-feed form of that id (not yet fetched).
+  - id: harvard-cfa-colloquium
+    name: CfA Colloquium
+    type: colloquium
+    url: https://www.cfa.harvard.edu/node/9159
+    adapter: html
+    params:
+      list_url: https://www.cfa.harvard.edu/node/9159
+    domains: [www.cfa.harvard.edu]
+    keeps_past_events: unknown
+    notes: Drupal 10; term schedule table (date, speaker, title).
+  - id: harvard-itc-luncheon
+    name: ITC Luncheon
+    type: other
+    url: https://itc.cfa.harvard.edu/luncheons
+    adapter: html
+    params:
+      list_url: https://itc.cfa.harvard.edu/luncheons
+    domains: [itc.cfa.harvard.edu]
+    keeps_past_events: true
+    notes: Four 10-minute talks per session; per-year pages (itc-luncheon-YYYY-YYYY).

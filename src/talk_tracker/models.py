@@ -36,6 +36,8 @@ class AdapterName(StrEnum):
     rss = "rss"
     html = "html"
     browser = "browser"
+    #: Northwestern PlanIt Purple XML feed (xmlfeed?cal=ID&start=&end=)
+    planitpurple = "planitpurple"
     #: No feasible adapter; ``notes`` must give the reason (PLAN.md §0.3, M1).
     unsupported = "unsupported"
 
@@ -59,6 +61,9 @@ class Series(_Strict):
     domains: list[str] = Field(min_length=1)
     keeps_past_events: bool | Literal["unknown"] = "unknown"
     active: bool = True
+    #: True once the feed/adapter assignment has been confirmed against the live site
+    #: (e.g. with ``talk-tracker probe``); False for survey assignments made from search.
+    verified: bool = False
     notes: str = ""
 
     @property

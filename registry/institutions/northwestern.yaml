@@ -1,0 +1,43 @@
+# Survey 2026-10-07 (web search; feeds not yet probed live).
+id: northwestern
+name: Northwestern University
+country: US
+timezone: America/Chicago
+series:
+  - id: northwestern-physics-astronomy-colloquium
+    name: Physics and Astronomy Colloquia
+    type: colloquium
+    url: https://planitpurple.northwestern.edu/calendar/3758
+    adapter: planitpurple
+    params:
+      base_url: https://planitpurple.northwestern.edu
+      cal: 3758
+    domains: [planitpurple.northwestern.edu]
+    keeps_past_events: true
+    notes: >-
+      PlanIt Purple calendar 3758. Documented XML feed: /xmlfeed?cal=<id>&start=mm-dd-yyyy
+      &end=mm-dd-yyyy (archive=1 reaches 4 years back). Titles read
+      "Colloquium: <Speaker>: <Title>".
+  - id: northwestern-ciera-interdisciplinary-colloquium
+    name: CIERA Interdisciplinary Colloquia
+    type: colloquium
+    url: https://ciera.northwestern.edu/programs/interdisciplinary-colloquia/
+    adapter: planitpurple
+    params:
+      base_url: https://planitpurple.northwestern.edu
+      cal: 4336
+    domains: [planitpurple.northwestern.edu]
+    keeps_past_events: true
+  - id: northwestern-ciera-astrophysics-seminar
+    name: CIERA Astrophysics Seminar
+    type: seminar
+    url: https://ciera.northwestern.edu/programs/astrophysics-seminars
+    adapter: planitpurple
+    params:
+      base_url: https://planitpurple.northwestern.edu
+    domains: [planitpurple.northwestern.edu]
+    keeps_past_events: true
+    notes: >-
+      Tuesdays 11 am. Events link to planitpurple.northwestern.edu/event/<id>; calendar id
+      not yet identified (TODO: probe). CIERA's visitor database
+      (ciera.northwestern.edu/visits/) lists past speakers.
