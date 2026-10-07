@@ -1,4 +1,5 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live). Includes IAS.
+# Survey 2026-10-07 (web search + URLs supplied by the group; feeds not yet probed live).
+# Includes IAS.
 id: princeton
 name: Princeton University / Institute for Advanced Study
 country: US
@@ -7,13 +8,16 @@ series:
   - id: princeton-ias-joint-astrophysics-colloquium
     name: Joint IAS / Princeton University Astrophysics Colloquium
     type: colloquium
-    url: https://www.ias.edu/sns/astrophysics/joint-iaspu-astrophysics-colloquium
+    url: https://web.astro.princeton.edu/events/colloquia
     adapter: html
     params:
-      list_url: https://www.ias.edu/sns/astrophysics/joint-iaspu-astrophysics-colloquium
-    domains: [www.ias.edu]
+      list_url: https://web.astro.princeton.edu/events/colloquia
+    domains: [web.astro.princeton.edu]
     keeps_past_events: true
-    notes: Drupal 11, paginated (?page=N). Archive at /sns/astrophysics/seminars/colloquium/all.
+    notes: >-
+      Drupal 11. Princeton Astro page lists the current and past semesters on one page
+      (date, speaker, affiliation). Mirror: www.ias.edu/sns/astrophysics/joint-iaspu-
+      astrophysics-colloquium (paginated, archive at /sns/astrophysics/seminars/colloquium/all).
   - id: princeton-ias-astrophysics-seminars
     name: IAS Astrophysics Calendar (seminars)
     type: seminar
@@ -26,3 +30,26 @@ series:
     notes: >-
       Combined calendar (IAS Astrophysics Seminar, informal seminars, joint colloquium);
       paginated (?page=N, 13+ pages seen). Entries need per-event series labels.
+  - id: princeton-physics-colloquium
+    name: Donald R. Hamilton Colloquium
+    type: colloquium
+    url: https://phy.princeton.edu/events/donald-r-hamilton-colloquium-series
+    adapter: html
+    params:
+      list_url: https://phy.princeton.edu/events/donald-r-hamilton-colloquium-series
+    domains: [phy.princeton.edu]
+    keeps_past_events: true
+    notes: Princeton Physics colloquium (Drupal 11). Department-wide past events at /events/archive.
+  - id: princeton-astroparticle-seminar
+    name: Astroparticle Seminar
+    type: seminar
+    url: https://phy.princeton.edu/events
+    adapter: html
+    params:
+      list_url: https://phy.princeton.edu/events
+    domains: [phy.princeton.edu]
+    keeps_past_events: true
+    notes: >-
+      Listed as a series filter on phy.princeton.edu/events; the series-specific URL was not
+      visible in page text (TBD by probe). Other series there (HEP experiment/theory,
+      gravity, phenomenology) not registered.

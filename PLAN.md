@@ -309,7 +309,7 @@ Decisions and deviations made during M0:
 Checked against the current Group Members doc in a session (not committed): 24 entries parsed (6 member, 4 joint, 5 postdoc, 7 student, 2 former), all ORCID checksums valid, conflict names extracted for 7 people.
 
 ### M1 — pilot survey (2026-10-07; live confirmation pending)
-Delivered: 10 institution files (32 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
+Delivered: 10 institution files (35 series) in `registry/institutions/`, `docs/survey.md` (method, summary, gaps, generated table), `talk-tracker probe` (platform/feed detection on series pages, optional feed checks, markdown + JSON output), `talk-tracker list`.
 
 How the survey was done: the Claude workspace cannot reach university or lab sites from its shell, and its page fetcher returns extracted text without `<head>`/feed links (and sometimes stale copies). Assignments were therefore made from web search and page text. All series are `verified: false`. The exit criterion ("every pilot series has an adapter assignment or is marked unsupported") is met provisionally. M1 is complete once `talk-tracker probe` has been run from a normal network and its results applied.
 
@@ -318,6 +318,6 @@ Decisions and deviations made during M1:
 - New adapter `planitpurple` (Northwestern), to be implemented in M2 alongside the others.
 - A registry series may be a listing page that mixes several named series (e.g. UChicago A&A/KICP colloquia, IAS astrophysics calendar); the per-event series label will need to be parsed in M2.
 - KIPAC tea talks and ITC luncheons are registered as `type: other` (not invited by default) so that they show up only for review.
-- `html` with `params.list_url` is used as the placeholder where no feed was identified: 19 of 32 series. The probe is expected to move some of them to structured adapters.
-- Not registered (pages not found by search): Princeton Physics Colloquium, MIT Physics Colloquium. See `docs/survey.md`.
+- `html` with `params.list_url` is used as the placeholder where no feed was identified: 24 of 35 series. The probe is expected to move some of them to structured adapters.
+- Princeton (Hamilton Colloquium, Astroparticle Seminar, Princeton Astro colloquium page) and MIT (Harris Physics Colloquium, MKI event-type pages) URLs were supplied by the group. MIT MKI was moved from `tribe` to `html` until the probe settles which applies. See `docs/survey.md` for the remaining TBD ids.
 

@@ -1,28 +1,43 @@
-# Survey 2026-10-07 (web search; feeds not yet probed live).
+# Survey 2026-10-07 (web search + URLs supplied by the group; feeds not yet probed live).
 id: mit
 name: Massachusetts Institute of Technology
 country: US
 timezone: America/New_York
 series:
+  - id: mit-physics-colloquium
+    name: David and Edith Harris Physics Colloquium
+    type: colloquium
+    url: https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/
+    adapter: html
+    params:
+      list_url: https://physics.mit.edu/events/david-and-edith-harris-physics-colloquium-series/
+    domains: [physics.mit.edu]
+    keeps_past_events: true
+    notes: >-
+      WordPress; current and past semesters on one page (date, speaker, affiliation,
+      title). Department calendar at physics.mit.edu/events/.
   - id: mit-mki-astrophysics-colloquium
     name: MKI Astrophysics Colloquium
     type: colloquium
-    url: https://space.mit.edu/events/
-    adapter: tribe
+    url: https://www.space.mit.edu/events/event-type/astrophysics-colloquium/
+    adapter: html
     params:
-      base_url: https://space.mit.edu
-    domains: [space.mit.edu]
+      list_url: https://www.space.mit.edu/events/event-type/astrophysics-colloquium/
+    domains: [www.space.mit.edu]
     keeps_past_events: true
     notes: >-
-      WordPress + The Events Calendar; paginated /events/page/N/. One calendar for all MKI
-      series; filter by tribe category (slug TBD by probe). Also www.space.mit.edu.
+      WordPress with an "event-type" taxonomy; paginated /page/N/. One text extraction
+      reported The Events Calendar (tribe), another found no tribe markers: probe decides
+      between tribe and html.
   - id: mit-mki-science-talks
     name: MKI Monday Afternoon Science Talks
     type: seminar
-    url: https://space.mit.edu/events/
-    adapter: tribe
+    url: https://www.space.mit.edu/events/
+    adapter: html
     params:
-      base_url: https://space.mit.edu
-    domains: [space.mit.edu]
+      list_url: https://www.space.mit.edu/events/
+    domains: [www.space.mit.edu]
     keeps_past_events: true
-    notes: Two visiting researchers per session; same calendar as the colloquium.
+    notes: >-
+      Two visiting researchers per session. Event type "Monday Afternoon Science Talks"
+      exists on /events/; its /events/event-type/<slug>/ URL is TBD.
